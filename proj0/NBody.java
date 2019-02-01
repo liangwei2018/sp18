@@ -10,6 +10,7 @@ public class NBody {
      * The method readRadius takes in a text file FILENAME about a universe 
      * and returns the radius of the universe.
      */
+    
         In in = new In(fileName);
         int N = in.readInt();
         double R = in.readDouble();

@@ -132,6 +132,7 @@ public class Planet {
     /**
      * The draw method draws one Planet.
      */
+    
     StdDraw.picture(xxPos, yyPos, "images/"+imgFileName); 
 
     }
