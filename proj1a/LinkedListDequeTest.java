@@ -72,6 +72,8 @@ public class LinkedListDequeTest {
         passed = checkStringItem("front", lld1.getRecursive(0)) && passed;
         passed = checkStringItem("back", lld1.getRecursive(2)) && passed;
 
+        /* this test is for 2019 project 1a instead of 2018
+         *
         LinkedListDeque<String> lld2 = new LinkedListDeque<>(lld1);
 
 
@@ -83,6 +85,7 @@ public class LinkedListDequeTest {
 
         System.out.println("Printing out lld2 deque: ");
         lld2.printDeque();
+         */
 
         printTestStatus(passed);
 

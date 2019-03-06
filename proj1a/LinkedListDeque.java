@@ -28,7 +28,7 @@ public class LinkedListDeque<T> {
 
     /** Creates an empty list. */
     public LinkedListDeque() {
-        sentinel = new StuffNode( null, null, null);
+        sentinel = new StuffNode(null, null, null);
         sentinel.prev = sentinel;
         sentinel.next = sentinel;
         size = 0;
@@ -40,7 +40,10 @@ public class LinkedListDeque<T> {
      * @param other An object of LinkedListDeque type to be deep copied
      *
      * An alternative method is to use addLast((T) other.get(i)) to do the deep copy
-     */
+     *
+     * This deep copy constructor is for 2019 Spring project 1a instead of 2018 Spring project 1a.
+     *              Comment this section for gradescope grading 2018
+     *
     public LinkedListDeque(LinkedListDeque other) {
         this.size = other.size;
         this.sentinel = new StuffNode(other.sentinel);
@@ -59,6 +62,7 @@ public class LinkedListDeque<T> {
         currentNode.next = sentinel;
         sentinel.prev = currentNode;
     }
+    */
 
     /** Adds ITEM to the front of the list. */
     public void addFirst(T item) {

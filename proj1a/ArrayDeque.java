@@ -26,7 +26,7 @@ public class ArrayDeque<T> {
      *
      * @param other An object of LinkedListDeque type to be deep copied
      */
-    public ArrayDeque(ArrayDeque<T> other) {
+    public ArrayDeque(ArrayDeque other) {
         size = other.size;
         int itemsLength = other.items.length;
         items = (T []) new Object[itemsLength];
@@ -88,10 +88,11 @@ public class ArrayDeque<T> {
         return size;
     }
 
-    /** Returns the length of the array. */
+    /** Returns the length of the array.
     public int length() {
         return items.length;
     }
+    */
 
     /** Prints each item of the list. */
     public void printDeque() {
@@ -111,6 +112,9 @@ public class ArrayDeque<T> {
 
     /** Removes the front item of the list. */
     public T removeFirst() {
+        if (size == 0) {
+            return null;
+        }
         int itemsLength = items.length;
         int firstItem = (nextFirst + 1) % itemsLength;
         T x = items[firstItem];
@@ -125,6 +129,9 @@ public class ArrayDeque<T> {
 
     /** Removes the back item of the list */
     public T removeLast() {
+        if (size == 0) {
+            return null;
+        }
         int itemsLength = items.length;
         int lastItem = (nextLast + itemsLength - 1) % itemsLength;
         T x = items[lastItem];
