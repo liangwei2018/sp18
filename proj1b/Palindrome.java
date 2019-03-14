@@ -27,7 +27,7 @@ public class Palindrome {
      * @return true if the WORD is a palindrome, and false otherwise.
      */
     public boolean isPalindrome(String word) {
-        if (word == null || !word.matches("[a-zA-Z]*")) {
+        if (word == null) {
             return false;
         }
         return isPalindromeHelper(wordToDeque(word));
@@ -50,7 +50,7 @@ public class Palindrome {
      */
     public boolean isPalindrome(String word, CharacterComparator cc) {
 
-        if (word == null || !word.matches("[a-zA-Z]*")) {
+        if (word == null) {
             return false;
         }
         int wLength = word.length();
