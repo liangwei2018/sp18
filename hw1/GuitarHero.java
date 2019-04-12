@@ -2,19 +2,19 @@
 import synthesizer.GuitarString;
 
 public class GuitarHero {
-    private static final int numKeys = 37;
+    private static final int NUMKEYS = 37;
     private static final double CONCERT = 440.0;
 
 
     public static void main(String[] args) {
         /* create 37 piano keys, for concert */
         String keyboard = "q2we4r5ty7u8i9op-[=zxdcfvgbnjmk,.;/' ";
-        GuitarString[] stringKey = new GuitarString[numKeys];
-        for(int i = 0; i < stringKey.length; i += 1) {
+        GuitarString[] stringKey = new GuitarString[NUMKEYS];
+        for (int i = 0; i < stringKey.length; i += 1) {
             stringKey[i] = new GuitarString(CONCERT * Math.pow(2, (i - 24.0) / 12.0));
         }
 
-       GuitarString pluckString = new GuitarString(CONCERT);
+        GuitarString pluckString = new GuitarString(CONCERT);
 
         while (true) {
 
@@ -23,7 +23,7 @@ public class GuitarHero {
                 char key = StdDraw.nextKeyTyped();
                 int index = keyboard.indexOf(key);
                 if (index < 0) {
-                   continue;
+                    continue;
                 }
                 pluckString = stringKey[index];
                 pluckString.pluck();
