@@ -216,7 +216,7 @@ public class GameWorld {
      * @param seed parameter gives seed,
      * @return a game World.
      */
-    static TETile[][] generateWorld(long seed) {
+    public static TETile[][] generateWorld(long seed) {
 
         Random rand = new Random(seed);
 
