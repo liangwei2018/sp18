@@ -3,6 +3,8 @@ package byog.Core;
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 
+import static byog.Core.GameWorld.generateWorld;
+
 public class Game {
     TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
@@ -28,11 +30,34 @@ public class Game {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] playWithInputString(String input) {
-        // TODO: Fill out this method to run the game using the input passed in,
+        //
         // and return a 2D tile representation of the world that would have been
         // drawn if the same inputs had been given to playWithKeyboard().
+        Long seed = 0L;
+        Character c0 = input.charAt(0);
+        if (c0 == 'N' || c0 == 'n' || c0 == 'L' || c0 == 'l') {
+            for (int i = 1; i < input.length(); i += 1) {
+                if (Character.isDigit(input.charAt(i))) {
+                    continue;
+                }
+                Character ci = input.charAt(i);
+                if (ci == 'S' || ci == 's') {
+                    if (i > 1) {
+                        String numberOnly = input.substring(1, i);
+                        seed = Long.parseLong(numberOnly, 10);
+                    } else {
+                        throw new IllegalArgumentException("No seed specified!");
+                    }
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("invalid arguments: [" + input + ")");
+        }
 
-        TETile[][] finalWorldFrame = null;
+        //String numberOnly= input.replaceAll("[^0-9]", "");
+        //long seed = Long.parseLong(numberOnly, 10);
+
+        TETile[][] finalWorldFrame = generateWorld(seed);
         return finalWorldFrame;
     }
 }
