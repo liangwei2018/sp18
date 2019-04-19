@@ -1,11 +1,13 @@
 package byog.Core;
 
-import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
 
 import java.util.Random;
+
+import static byog.TileEngine.Tileset.LOCKED_DOOR;
+
 
 /**
  * Generates the game world.
@@ -15,8 +17,10 @@ import java.util.Random;
  */
 
 public class GameWorld {
-    private static final int WIDTH = 60;
-    private static final int HEIGHT = 40;
+   // private static final int WIDTH = 60;
+   // private static final int HEIGHT = 40;
+   //public static boolean gameOver = false;
+   //public static boolean playerTurn = false;
 
     private static final int LMAX = 6;
     private static final int LMIN = 1;
@@ -26,15 +30,17 @@ public class GameWorld {
 
     private static final TETile FLOOR = Tileset.FLOOR;
     private static final TETile WALL = Tileset.WALL;
+    private static final TETile PLAYER = Tileset.PLAYER;
+
     private static final int CMAX = 32;
-    //private static final TETile SIDE = TETile.colorVariant(WALL,
-     //       64, 64, 64, RANDOM);
+
 
     private static final TETile ENTRY = Tileset.LOCKED_DOOR;
     private static final TETile EXIT = Tileset.FLOOR;
     //private static final Room.Side ENTRY_SIDE = Room.Side.BOTTOM;
 
     //private static int numRooms = 0;
+    //private static Pos playerPos;
 
 
 
@@ -50,6 +56,7 @@ public class GameWorld {
             y = y0;
         }
     }
+
 
 
     /**
@@ -132,11 +139,13 @@ public class GameWorld {
      * Generate and draw a random neighbor room.
      * @param r the original room.
      * @param dir neighbor directions: 0 right, 1 top, 3 left.
-     * @param rand random number
+     * @param rand random number.
+     * @param w the width of the world.
+     * @param h the height of the world.
      *
      */
     static void randomNeighbor(TETile[][] world, Room r, int dir,
-                               Random rand) {
+                               Random rand, int w, int h) {
         int xStart = r.right + 1;
         int yStart = r.top + 1;
         if (dir == 0) {
@@ -161,9 +170,9 @@ public class GameWorld {
         }
 
         Pos randPos = new GameWorld().new Pos(xStart, yStart);
-        int minW = Math.min(randPos.x, WIDTH - randPos.x - 1);
+        int minW = Math.min(randPos.x, w - randPos.x - 1);
         int maxRoomWidth = Math.min(LMAX, minW);
-        int minH = Math.min(randPos.y, HEIGHT - randPos.y - 1);
+        int minH = Math.min(randPos.y, h - randPos.y - 1);
         int maxRoomHeight = Math.min(LMAX, minH);
 
         if (maxRoomHeight <= LMIN + 1 || maxRoomWidth <= LMIN + 1) {
@@ -213,24 +222,27 @@ public class GameWorld {
 
     /**
      * Generate the game world
+     *
      * @param seed parameter gives seed,
+     * @param w the width of the world.
+     * @param h the height of the world.
      * @return a game World.
      */
-    public static TETile[][] generateWorld(long seed) {
+    public static TETile[][] generateWorld(long seed, int w, int h) {
 
         Random rand = new Random(seed);
 
-        TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
+       // TERenderer ter = new TERenderer();
+       // ter.initialize(w, h);
 
-        TETile[][] world = new TETile[WIDTH][HEIGHT];
-        for (int x = 0; x < WIDTH; x += 1) {
-            for (int y = 0; y < HEIGHT; y += 1) {
+        TETile[][] world = new TETile[w][h];
+        for (int x = 0; x < w; x += 1) {
+            for (int y = 0; y < h; y += 1) {
                 world[x][y] = Tileset.NOTHING;
             }
         }
 
-        int randX0 = randRange(20, 40, rand);
+        int randX0 = randRange(w / 3, w * 2 / 3, rand);
         int randY0 = randRange(3, 8, rand);
         int randWidth = randRange(LMIN, LMAX, rand);
         int randHeight = randRange(LMIN, LMAX, rand);
@@ -244,25 +256,119 @@ public class GameWorld {
         while (i < Room.list.size() && i < randNumRooms) {
             Room r = Room.list.get(i);
 
-            if (r.right < WIDTH - 4) {
-                randomNeighbor(world, r, 0, rand);
+            if (r.right < w - 4) {
+                randomNeighbor(world, r, 0, rand, w, h);
             }
 
-            if (r.top < HEIGHT - 4) {
-                randomNeighbor(world, r, 1, rand);
+            if (r.top < h - 4) {
+                randomNeighbor(world, r, 1, rand, w, h);
             }
 
             if (r.left > 4) {
-                randomNeighbor(world, r, 2, rand);
+                randomNeighbor(world, r, 2, rand, w, h);
             }
 
             i += 1;
         }
 
-        //int randExit = randRange(i-3, i-1, rand);
-        //world[Room.list.get(randExit).left + 1][Room.list.get(randExit).top] = EXIT;
+        //ter.renderFrame(world);
+        return world;
+    }
 
-        ter.renderFrame(world);
+    /**
+     * Initializes player position.
+     * @param world the world to play on.
+     * @return the player position.
+     */
+    public static Pos playerInitialize(TETile[][] world) {
+        for (int i = 0; i < world.length; i += 1) {
+            for (int j = 0; j < world[i].length; j += 1) {
+                if (world[i][j].equals(LOCKED_DOOR)) {
+                    world[i][j + 1] = PLAYER;
+                    return new GameWorld().new Pos(i, j + 1);
+                }
+            }
+        }
+        return null;
+    }
+    /**
+     * Gets the player position.
+     * @param world the world to play on.
+     * @return the player position.
+     */
+    public static Pos getPlayerPos(TETile[][] world) {
+        for (int i = 0; i < world.length; i += 1) {
+            for (int j = 0; j < world[i].length; j += 1) {
+                if (world[i][j].equals(PLAYER)) {
+                    return new GameWorld().new Pos(i, j);
+                }
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Simulate movement based on the input character.
+     * @param world the world to play on.
+     * @param ch the input character.
+     * @param playerPos the old position of the player.
+     * @return the new position of the player.
+     */
+    public static Pos movement(TETile[][] world, char ch, Pos playerPos) {
+
+        int x = playerPos.x;
+        int y = playerPos.y;
+
+        switch (ch) {
+            case 'A':
+            case 'a':
+                if (world[x - 1][y].equals(FLOOR)) {
+                    //world[x][y] = FLOOR;
+                    //world[x - 1][y] = PLAYER;
+                    return new GameWorld().new Pos(x - 1, y);
+                }
+
+                break;
+            case 'S':
+            case 's':
+                if (world[x][y - 1].equals(FLOOR)) {
+                    //world[x][y] = FLOOR;
+                    //world[x][y - 1] = PLAYER;
+                    return new GameWorld().new Pos(x, y - 1);
+                }
+                break;
+            case 'D':
+            case 'd':
+                if (world[x + 1][y].equals(FLOOR)) {
+                    //world[x][y] = FLOOR;
+                    //world[x + 1][y] = PLAYER;
+                    return new GameWorld().new Pos(x + 1, y);
+                }
+                break;
+            case 'W':
+            case 'w':
+                if (world[x][y + 1].equals(FLOOR)) {
+                   //world[x][y] = FLOOR;
+                   //world[x][y + 1] = PLAYER;
+                    return new GameWorld().new Pos(x, y + 1);
+                }
+                break;
+            default:
+        }
+        return new GameWorld().new Pos(x, y);
+    }
+
+    /**
+     * Updates the world.
+     * @param world the world to play on
+     * @param oldPos the old position of the player.
+     * @param newPos the new position of the player.
+     * @return the updated world.
+     */
+    public static TETile[][] updateWorld(TETile[][] world, Pos oldPos, Pos newPos) {
+        world[oldPos.x][oldPos.y] = FLOOR;
+        world[newPos.x][newPos.y] = PLAYER;
         return world;
     }
 
