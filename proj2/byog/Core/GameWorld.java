@@ -102,7 +102,7 @@ public class GameWorld {
      * @param next the neighbor room.
      * @param dir the direction from room r to next: 0 right, 1 top, 3 left
      */
-    static void wallToFloor(TETile[][] world, Room r, Room next, int dir) {
+    public static void wallToFloor(TETile[][] world, Room r, Room next, int dir) {
         int nx = next.position.x;
         int ny = next.position.y;
         int nw = next.width;
@@ -144,7 +144,7 @@ public class GameWorld {
      * @param h the height of the world.
      *
      */
-    static void randomNeighbor(TETile[][] world, Room r, int dir,
+    public static void randomNeighbor(TETile[][] world, Room r, int dir,
                                Random rand, int w, int h) {
         int xStart = r.right + 1;
         int yStart = r.top + 1;
@@ -212,7 +212,7 @@ public class GameWorld {
      * @param rand random number.
      * @return the random int number between xMin and xMax.
      */
-    static int randRange(int xMin, int xMax, Random rand) {
+    public static int randRange(int xMin, int xMax, Random rand) {
         if (xMin >= xMax || (long) xMax - xMin >= Integer.MAX_VALUE) {
             throw new IllegalArgumentException("invalid range: [" + xMin
                     + ", " + xMax + ")");

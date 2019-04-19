@@ -18,7 +18,7 @@ public class Game {
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
-    //public static boolean gameOver = false;
+    
 
 
 
