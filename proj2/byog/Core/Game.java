@@ -3,7 +3,6 @@ package byog.Core;
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 
-import edu.princeton.cs.introcs.StdDraw;
 
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
@@ -19,7 +18,7 @@ public class Game {
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
 
-    public static String moves = "";
+    private static String moves = "";
 
 
 
