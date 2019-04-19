@@ -2,8 +2,11 @@ package byog.Core;
 
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
+import edu.princeton.cs.introcs.StdDraw;
 
 
+import java.awt.Font;
+import java.awt.Color;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.FileOutputStream;
@@ -16,10 +19,11 @@ public class Game {
     TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
-    public static final int HEIGHT = 30;
+    public static final int HEIGHT = 40;
 
+
+    private static long seed = 0L;
     private static String moves = "";
-
 
 
 
@@ -30,6 +34,10 @@ public class Game {
      * Method used for playing a fresh game. The game should start from the main menu.
      */
     public void playWithKeyboard() {
+        ter.initialize(WIDTH, HEIGHT);
+        drawMenu();
+
+
     }
 
     /**
@@ -48,7 +56,7 @@ public class Game {
         //
         // and return a 2D tile representation of the world that would have been
         // drawn if the same inputs had been given to playWithKeyboard().
-        long seed = 0L;
+        //long seed = 0L;
         char c0 = input.charAt(0);
         TETile[][] world = null;
         GameWorld.Pos playerPos = null;
@@ -170,5 +178,43 @@ public class Game {
         //StdDraw.pause(500);
 
     }
+
+    public void drawMenu() {
+        /*
+         * Take the string and display it in the center of the screen
+         * If game is not over, display relevant game information at the top of the screen
+         */
+        /*
+        if (s == null) {
+            throw new IllegalArgumentException("String is null or empty.");
+        }
+*/
+        int midWidthh = WIDTH / 2;
+        int midHeight = HEIGHT / 2;
+
+        /* Clears the drawing window. */
+        StdDraw.clear(Color.BLACK);
+
+        /* Draw the GUI */
+
+        Font fontTop = new Font("Arial", Font.BOLD, 40);
+        StdDraw.setFont(fontTop);
+        StdDraw.setPenColor(StdDraw.WHITE);
+        StdDraw.text(midWidthh,   0.8 * HEIGHT,  "CS61B:  THE GAME");
+
+
+
+        /* Draw the actual text */
+        Font font = new Font("Arial MS Unicode", Font.BOLD, 30);
+        StdDraw.setFont(font);
+        StdDraw.setPenColor(StdDraw.WHITE);
+
+
+        StdDraw.text(midWidthh, midHeight, "New Game (N)");
+        StdDraw.text(midWidthh, midHeight - 2, "Load Game (L)");
+        StdDraw.text(midWidthh, midHeight - 4, "Quit (N)");
+        StdDraw.show();
+    }
+
 
 }

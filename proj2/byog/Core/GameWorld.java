@@ -22,8 +22,8 @@ public class GameWorld {
    //public static boolean gameOver = false;
    //public static boolean playerTurn = false;
 
-    private static final int LMAX = 6;
-    private static final int LMIN = 1;
+    private static final int LMAX = 8;
+    private static final int LMIN = 2;
 
    // private static final long SEED = 2873123;
    // private static final Random RANDOM = new Random(SEED);
@@ -251,20 +251,20 @@ public class GameWorld {
         drawRoom(world, rm0, rand);
         world[randPos.x + randWidth / 2][rm0.bottom] = ENTRY;
 
-        int randNumRooms = randRange(50, 150, rand);
+        int randNumRooms = randRange(20, 120, rand);
         int i = 0;
         while (i < Room.list.size() && i < randNumRooms) {
             Room r = Room.list.get(i);
 
-            if (r.right < w - 4) {
+            if (r.right < w - randRange(3, 15, rand)) {
                 randomNeighbor(world, r, 0, rand, w, h);
             }
 
-            if (r.top < h - 4) {
+            if (r.top < h - randRange(3, 8, rand)) {
                 randomNeighbor(world, r, 1, rand, w, h);
             }
 
-            if (r.left > 4) {
+            if (r.left > randRange(3, 15, rand)) {
                 randomNeighbor(world, r, 2, rand, w, h);
             }
 
