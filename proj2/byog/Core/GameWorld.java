@@ -272,6 +272,7 @@ public class GameWorld {
         }
 
         //ter.renderFrame(world);
+        Room.list.clear();
         return world;
     }
 

@@ -15,7 +15,20 @@ public class Main {
             Game game = new Game();
             TETile[][] worldState = game.playWithInputString(args[0]);
             System.out.println(TETile.toString(worldState));
+            /*
             game.startGame(worldState);
+            TETile[][] worldState1 = game.playWithInputString("n3277701080089882166s");
+            game.startGame(worldState1);
+            System.out.println(TETile.toString(worldState1));
+            for (int i = 0; i < worldState.length; i += 1) {
+                for (int j = 0; j < worldState[i].length; j += 1) {
+                    if (!worldState[i][j].equals(worldState1[i][j])) {
+                        System.out.println("Difference: " + worldState[i][j].character()
+                                + " : " + worldState1[i][j].description());
+                    }
+                }
+            }
+            */
         } else {
             Game game = new Game();
             game.playWithKeyboard();

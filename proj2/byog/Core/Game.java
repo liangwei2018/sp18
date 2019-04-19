@@ -60,6 +60,7 @@ public class Game {
         char c0 = input.charAt(0);
         TETile[][] world = null;
         GameWorld.Pos playerPos = null;
+        //GameWorld GameWorld = new GameWorld();
 
         //ter.initialize(WIDTH, HEIGHT);
 
@@ -112,13 +113,10 @@ public class Game {
                 GameWorld.Pos newPos = GameWorld.movement(world, c, playerPos);
                 world = GameWorld.updateWorld(world, playerPos, newPos);
                 playerPos = newPos;
-                //ter.renderFrame(world);
-                //StdDraw.pause(500);
             }
 
             if (c == ':' && (moves.charAt(i + 1) == 'Q'
                     || moves.charAt(i + 1) == 'q')) {
-                //gameOver = true;
 
                 saveFile(world, "savefile.txt");
                 break;
