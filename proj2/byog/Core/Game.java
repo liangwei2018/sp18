@@ -18,7 +18,9 @@ public class Game {
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
-    
+
+    public static String moves = "";
+
 
 
 
@@ -49,11 +51,10 @@ public class Game {
         // drawn if the same inputs had been given to playWithKeyboard().
         long seed = 0L;
         char c0 = input.charAt(0);
-        String moves = "";
         TETile[][] world = null;
         GameWorld.Pos playerPos = null;
 
-        ter.initialize(WIDTH, HEIGHT);
+        //ter.initialize(WIDTH, HEIGHT);
 
         if (c0 == 'N' || c0 == 'n') {
             // start a new game
@@ -78,13 +79,13 @@ public class Game {
             if (playerPos == null) {
                 throw new IllegalArgumentException("No Player!");
             }
-            ter.renderFrame(world);
+        //   ter.renderFrame(world);
         } else if (c0 == 'L' || c0 == 'l') {
             // load a saved game
             moves = input.substring(1);
 
             world = loadFile("savefile.txt");
-            ter.renderFrame(world);
+         //   ter.renderFrame(world);
 
             playerPos = GameWorld.getPlayerPos(world);
 
@@ -97,7 +98,6 @@ public class Game {
                     + input + ")");
         }
 
-
         for (int i = 0; i < moves.length(); i += 1) {
             char c = moves.charAt(i);
             if (c == 'A' || c == 'a' || c == 'S' || c == 's'
@@ -105,8 +105,8 @@ public class Game {
                 GameWorld.Pos newPos = GameWorld.movement(world, c, playerPos);
                 world = GameWorld.updateWorld(world, playerPos, newPos);
                 playerPos = newPos;
-                ter.renderFrame(world);
-                StdDraw.pause(500);
+                //ter.renderFrame(world);
+                //StdDraw.pause(500);
             }
 
             if (c == ':' && (moves.charAt(i + 1) == 'Q'
@@ -118,6 +118,7 @@ public class Game {
             }
 
         }
+
         return world;
     }
 
@@ -164,73 +165,11 @@ public class Game {
         }
     }
 
-/*
-    public TETile[][] startGame(boolean newGame, long seed, String s) {
+    public void startGame(TETile[][] world) {
+        ter.initialize(WIDTH, HEIGHT);
+        ter.renderFrame(world);
+        //StdDraw.pause(500);
 
-
-        TETile[][] world = GameWorld.generateWorld(ter, seed, WIDTH, HEIGHT);
-        while (!gameOver) {
-            if (newGame) {
-                GameWorld.playerInitialize(world);
-                ter.renderFrame(world);
-            } else {
-                try
-                {
-                    //FileInputStream file = new FileInputStream("savefile" + seed + ".txt");
-                    FileInputStream file = new FileInputStream("savefile.txt");
-                    ObjectInputStream in = new ObjectInputStream(file);
-
-                    world = (TETile[][]) in.readObject();
-
-                    in.close();
-                    file.close();
-
-                }
-
-                catch(IOException e)
-                {
-                    e.printStackTrace();
-                }
-
-                catch(ClassNotFoundException e)
-                {
-                    System.out.println("ClassNotFoundException!");
-                }
-            }
-
-
-            for (int i = 0; i < s.length(); i += 1) {
-                Character c = s.charAt(i);
-                if (c == ':' && (s.charAt(i + 1) == 'Q' || s.charAt(i + 1) == 'q')) {
-                    gameOver = true;
-                    try
-                    {
-
-                        //FileOutputStream file = new FileOutputStream("savefile" + seed + ".txt");
-                        FileOutputStream file = new FileOutputStream("savefile.txt");
-                        ObjectOutputStream save = new ObjectOutputStream(file);
-
-                        save.writeObject(world);
-
-
-                        save.close();
-                        file.close();
-                    }
-
-                    catch(IOException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    break;
-                } else {
-                    world = GameWorld.movement(world, c);
-                    ter.renderFrame(world);
-                    StdDraw.pause(500);
-                }
-            }
-        }
-        return world;
     }
-    */
 
 }
