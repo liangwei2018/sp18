@@ -16,8 +16,8 @@ import java.io.IOException;
 public class Game {
     TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
-    public static final int WIDTH = 20;
-    public static final int HEIGHT = 10;
+    public static final int WIDTH = 80;
+    public static final int HEIGHT = 30;
     //public static boolean gameOver = false;
 
 
