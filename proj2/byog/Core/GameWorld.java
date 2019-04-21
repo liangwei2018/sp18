@@ -6,43 +6,30 @@ import byog.TileEngine.Tileset;
 
 import java.util.Random;
 
-import static byog.TileEngine.Tileset.LOCKED_DOOR;
-
 
 /**
- * Generates the game world.
+ * Generates and updates the random game world/map, including the position of
+ * player, Entry, Exit, FLOOR, WALL.
  *
  * @author Liang Wei
  *
  */
 
 public class GameWorld {
-   // private static final int WIDTH = 60;
-   // private static final int HEIGHT = 40;
-   //public static boolean gameOver = false;
-   //public static boolean playerTurn = false;
 
-    private static final int LMAX = 8;
-    private static final int LMIN = 2;
+   // Maximum/Minimum room size.
+    private static final int LMAX = 6;
+    private static final int LMIN = 1;
 
-   // private static final long SEED = 2873123;
-   // private static final Random RANDOM = new Random(SEED);
+
+    // wall Tile color variance maximum.
+    private static final int CMAX = 32;
 
     private static final TETile FLOOR = Tileset.FLOOR;
     private static final TETile WALL = Tileset.WALL;
     private static final TETile PLAYER = Tileset.PLAYER;
-
-    private static final int CMAX = 32;
-
-
     private static final TETile ENTRY = Tileset.LOCKED_DOOR;
-    private static final TETile EXIT = Tileset.FLOOR;
-    //private static final Room.Side ENTRY_SIDE = Room.Side.BOTTOM;
-
-    //private static int numRooms = 0;
-    //private static Pos playerPos;
-
-
+    private static final TETile EXIT = Tileset.UNLOCKED_DOOR;
 
 
     /**
@@ -54,6 +41,21 @@ public class GameWorld {
         Pos(int x0, int y0) {
             x = x0;
             y = y0;
+        }
+
+        /**
+         * Check if the current (this) position and p position collapse.
+         * @param p the position to compare.
+         * @return true if two position collapse, false otherwise.
+         */
+        public boolean equals(Pos p) {
+            if (this == p) {
+                return true;
+            }
+            if (p == null) {
+                return false;
+            }
+            return this.x == p.x && this.y == p.y;
         }
     }
 
@@ -148,21 +150,22 @@ public class GameWorld {
                                Random rand, int w, int h) {
         int xStart = r.right + 1;
         int yStart = r.top + 1;
+        int randOffset = randRange(1, 5, rand);
         if (dir == 0) {
             if (r.height == 1) {
-                yStart = r.top - 1;
+                yStart = r.top - randOffset;
             } else {
                 yStart = randRange(r.bottom + 1, r.top - 1, rand);
             }
         } else if (dir == 1) {
             if (r.width == 1) {
-                xStart = r.right - 1;
+                xStart = r.right - randOffset;
             } else {
                 xStart = randRange(r.left + 1, r.right - 1, rand);
             }
         } else if (dir == 2) {
             if (r.height == 1) {
-                yStart = r.top - 1;
+                yStart = r.top - randOffset;
             } else {
                 yStart = randRange(r.bottom + 1, r.top - 1, rand);
             }
@@ -189,6 +192,17 @@ public class GameWorld {
         } else if (dir == 2 && r.height > 1) {
             randHeight = 1;
         }
+
+        if (r.height == 1 && (dir == 0 || dir == 2)) {
+            if (randHeight < randOffset) {
+                randHeight += randOffset;
+            }
+        } else if (r.width == 1 && dir == 1) {
+            if (randWidth < randOffset) {
+                randWidth += randOffset;
+            }
+        }
+
 
         if (dir == 2) {
             randPos = new GameWorld().new Pos(xStart - randWidth + 1, yStart);
@@ -232,9 +246,6 @@ public class GameWorld {
 
         Random rand = new Random(seed);
 
-       // TERenderer ter = new TERenderer();
-       // ter.initialize(w, h);
-
         TETile[][] world = new TETile[w][h];
         for (int x = 0; x < w; x += 1) {
             for (int y = 0; y < h; y += 1) {
@@ -242,56 +253,74 @@ public class GameWorld {
             }
         }
 
-        int randX0 = randRange(w / 3, w * 2 / 3, rand);
+        int randX0 = randRange(w / 5, w * 2 / 3, rand);
         int randY0 = randRange(3, 8, rand);
         int randWidth = randRange(LMIN, LMAX, rand);
         int randHeight = randRange(LMIN, LMAX, rand);
         GameWorld.Pos randPos = new GameWorld().new Pos(randX0, randY0);
         Room rm0 = new Room(randPos, randWidth, randHeight);
         drawRoom(world, rm0, rand);
-        world[randPos.x + randWidth / 2][rm0.bottom] = ENTRY;
 
-        int randNumRooms = randRange(20, 120, rand);
+        int maxTop = rm0.top;
+        int minBottom = rm0.bottom;
+        int maxIndex = 0;
+        int minIndex = 0;
         int i = 0;
-        while (i < Room.list.size() && i < randNumRooms) {
+        while (i < Room.list.size()) {
             Room r = Room.list.get(i);
 
-            if (r.right < w - randRange(3, 15, rand)) {
+            if (r.right < w - randRange(10, 15, rand)) {
                 randomNeighbor(world, r, 0, rand, w, h);
             }
 
-            if (r.top < h - randRange(3, 8, rand)) {
+            if (r.top < h - randRange(10, 15, rand)) {
                 randomNeighbor(world, r, 1, rand, w, h);
             }
 
-            if (r.left > randRange(3, 15, rand)) {
+            if (r.left > randRange(10, 15, rand)) {
                 randomNeighbor(world, r, 2, rand, w, h);
             }
 
+            int top = r.top;
+            if (top > maxTop) {
+                maxTop = top;
+                maxIndex = i;
+            }
+            int bottom = r.bottom;
+            if (bottom < minBottom) {
+                minBottom = bottom;
+                minIndex = i;
+            }
             i += 1;
         }
 
-        //ter.renderFrame(world);
+        for (int j = i; j < Room.list.size(); j += 1) {
+            Room r = Room.list.get(j);
+            int top = r.top;
+            if (top > maxTop) {
+                maxTop = top;
+                maxIndex = j;
+            }
+            int bottom = r.bottom;
+            if (bottom < minBottom) {
+                minBottom = bottom;
+                minIndex = j;
+            }
+        }
+        Room topRoom = Room.list.get(maxIndex);
+        world[topRoom.position.x + (topRoom.width / 2)][topRoom.top] = EXIT;
+
+        Room bottomRoom = Room.list.get(minIndex);
+        int bx = bottomRoom.position.x + bottomRoom.width / 2;
+        int by = bottomRoom.bottom;
+        world[bx][by] = ENTRY;
+        world[bx][by + 1] = PLAYER;
+
         Room.list.clear();
         return world;
     }
 
-    /**
-     * Initializes player position.
-     * @param world the world to play on.
-     * @return the player position.
-     */
-    public static Pos playerInitialize(TETile[][] world) {
-        for (int i = 0; i < world.length; i += 1) {
-            for (int j = 0; j < world[i].length; j += 1) {
-                if (world[i][j].equals(LOCKED_DOOR)) {
-                    world[i][j + 1] = PLAYER;
-                    return new GameWorld().new Pos(i, j + 1);
-                }
-            }
-        }
-        return null;
-    }
+
     /**
      * Gets the player position.
      * @param world the world to play on.
@@ -301,6 +330,22 @@ public class GameWorld {
         for (int i = 0; i < world.length; i += 1) {
             for (int j = 0; j < world[i].length; j += 1) {
                 if (world[i][j].equals(PLAYER)) {
+                    return new GameWorld().new Pos(i, j);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets the player position.
+     * @param world the world to play on.
+     * @return the EXIT position.
+     */
+    public static Pos getExitPos(TETile[][] world) {
+        for (int i = 0; i < world.length; i += 1) {
+            for (int j = 0; j < world[i].length; j += 1) {
+                if (world[i][j].equals(EXIT)) {
                     return new GameWorld().new Pos(i, j);
                 }
             }
@@ -320,44 +365,36 @@ public class GameWorld {
 
         int x = playerPos.x;
         int y = playerPos.y;
+        TETile nextTile = null;
 
         switch (ch) {
             case 'A':
             case 'a':
-                if (world[x - 1][y].equals(FLOOR)) {
-                    //world[x][y] = FLOOR;
-                    //world[x - 1][y] = PLAYER;
-                    return new GameWorld().new Pos(x - 1, y);
-                }
-
+                x -= 1;
                 break;
+
             case 'S':
             case 's':
-                if (world[x][y - 1].equals(FLOOR)) {
-                    //world[x][y] = FLOOR;
-                    //world[x][y - 1] = PLAYER;
-                    return new GameWorld().new Pos(x, y - 1);
-                }
+                y -= 1;
                 break;
+
             case 'D':
             case 'd':
-                if (world[x + 1][y].equals(FLOOR)) {
-                    //world[x][y] = FLOOR;
-                    //world[x + 1][y] = PLAYER;
-                    return new GameWorld().new Pos(x + 1, y);
-                }
+                x += 1;
                 break;
+
             case 'W':
             case 'w':
-                if (world[x][y + 1].equals(FLOOR)) {
-                   //world[x][y] = FLOOR;
-                   //world[x][y + 1] = PLAYER;
-                    return new GameWorld().new Pos(x, y + 1);
-                }
+                y += 1;
                 break;
+
             default:
         }
-        return new GameWorld().new Pos(x, y);
+        nextTile = world[x][y];
+        if (nextTile.equals(FLOOR) || nextTile.equals(EXIT)) {
+            return new GameWorld().new Pos(x, y);
+        }
+        return new GameWorld().new Pos(playerPos.x, playerPos.y);
     }
 
     /**
