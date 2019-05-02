@@ -66,7 +66,9 @@ public class Percolation {
             if (row == 0) {
                 uf.union(top, pos1D);
                 ufTop.union(top, pos1D);
-            } else if (row == N - 1) {
+            }
+
+            if (row == N - 1) {
                 uf.union(bottom, pos1D);
             }
 

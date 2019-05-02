@@ -24,11 +24,12 @@ public class PercolationStats {
         if (N <= 0 || T <= 0) {
             throw new IllegalArgumentException();
         }
-        p = pf.make(N);
+
         this.T = T;
         openNum = new int[T];
 
         for (int i = 0; i < T; i += 1) {
+            p = pf.make(N);
             while (!p.percolates()) {
                 p.open(StdRandom.uniform(N), StdRandom.uniform(N));
             }
