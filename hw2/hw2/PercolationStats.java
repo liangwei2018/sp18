@@ -11,7 +11,7 @@ import edu.princeton.cs.introcs.StdStats;
 
 public class PercolationStats {
     private Percolation p;
-    private int[] openNum;
+    private double[] openNumRatio;
     private int T;
 
     /**
@@ -26,14 +26,14 @@ public class PercolationStats {
         }
 
         this.T = T;
-        openNum = new int[T];
+        openNumRatio = new double[T];
 
         for (int i = 0; i < T; i += 1) {
             p = pf.make(N);
             while (!p.percolates()) {
                 p.open(StdRandom.uniform(N), StdRandom.uniform(N));
             }
-            openNum[i] = p.numberOfOpenSites() / (N * N);
+            openNumRatio[i] = p.numberOfOpenSites() / (double) (N * N);
         }
     }
 
@@ -42,7 +42,7 @@ public class PercolationStats {
      * @return
      */
     public double mean() {
-        return StdStats.mean(openNum);
+        return StdStats.mean(openNumRatio);
     }
 
     /**
@@ -51,7 +51,7 @@ public class PercolationStats {
      */
 
     public double stddev() {
-        return StdStats.stddev(openNum);
+        return StdStats.stddev(openNumRatio);
     }
 
 
