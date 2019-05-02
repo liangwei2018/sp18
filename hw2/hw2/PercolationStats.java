@@ -33,7 +33,7 @@ public class PercolationStats {
             while (!p.percolates()) {
                 p.open(StdRandom.uniform(N), StdRandom.uniform(N));
             }
-            openNum[i] = p.numberOfOpenSites() / T;
+            openNum[i] = p.numberOfOpenSites() / (N * N);
         }
     }
 
