@@ -166,12 +166,12 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     @Override
     public V remove(K key) {
-
-        Node t = removeHelper(key, null, root);
-        if (t == null) {
+        V ret = get(key);
+        if (ret == null) {
             return null;
         }
-        return t.value;
+        root = removeHelper(key, null, root);
+        return ret;
     }
 
     private Node removeHelper(K key, V val, Node p) {
@@ -181,30 +181,31 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         if (p == null) {
             return null;
         }
-        Node ret = p;
+
         int cmp = key.compareTo(p.key);
         if (cmp < 0) {
-            return removeHelper(key, val, p.left);
+            p.left = removeHelper(key, val, p.left);
         } else if (cmp > 0) {
-            return removeHelper(key, val, p.right);
+            p.right = removeHelper(key, val, p.right);
         } else {
             if (val == null || val.equals(p.value)) {
                 if (p.left == null) {
-                    p = p.right;
+                    size -= 1;
+                    return p.right;
                 } else if (p.right == null) {
-                    p = p.left;
+                    size -= 1;
+                    return p.left;
                 } else {
+                    Node ret = p;
                     p = findMin(ret.right);
                     p.right = removeMin(ret.right);
                     p.left = ret.left;
+                    size -= 1;
                 }
-                size -= 1;
-                return ret;
-            } else {
-                return null;
-            }
 
+            }
         }
+        return p;
     }
 
     /** Removes the key-value entry for the specified key only if it is
@@ -219,12 +220,12 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         if (value == null) {
             throw new IllegalArgumentException("A null value for remove()!");
         }
-        Node t = removeHelper(key, value, root);
-        if (t == null) {
+        V ret = get(key);
+        if (ret == null || !ret.equals(value)) {
             return null;
         }
-        return t.value;
-
+        root = removeHelper(key, value, root);
+        return ret;
     }
 
     @Override
