@@ -1,5 +1,6 @@
 package lab9;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -7,7 +8,7 @@ import java.util.Set;
  *  A hash table-backed Map implementation. Provides amortized constant time
  *  access to elements via get(), remove(), and put() in the best case.
  *
- *  @author Your name here
+ *  @author Liang Wei
  */
 public class MyHashMap<K, V> implements Map61B<K, V> {
 
@@ -17,12 +18,21 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     private ArrayMap<K, V>[] buckets;
     private int size;
 
-    private int loadFactor() {
-        return size / buckets.length;
+    private double loadFactor() {
+        return size / (double) buckets.length;
     }
 
     public MyHashMap() {
         buckets = new ArrayMap[DEFAULT_SIZE];
+        this.clear();
+    }
+
+    /**
+     * Initial MyHashMap with intialSize buckets.
+     * @param initialSize initial number of buckets.
+     */
+    public MyHashMap(int initialSize) {
+        buckets = new ArrayMap[initialSize];
         this.clear();
     }
 
@@ -53,19 +63,47 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      */
     @Override
     public V get(K key) {
-        throw new UnsupportedOperationException();
+
+        if (key == null) {
+            throw new IllegalArgumentException("Null key not allowed.");
+        }
+        return buckets[hash(key)].get(key);
     }
 
     /* Associates the specified value with the specified key in this map. */
     @Override
     public void put(K key, V value) {
-        throw new UnsupportedOperationException();
+
+        if (key == null) {
+            throw new IllegalArgumentException("Null key not allowed.");
+        }
+        if (value == null) {
+            throw new IllegalArgumentException("Null values not allowed.");
+        }
+        if (loadFactor() > MAX_LF) {
+            resize(buckets.length * 2);
+        }
+        int h = hash(key);
+        if (!buckets[h].containsKey(key)) {
+            size += 1;
+        }
+        buckets[h].put(key, value);
     }
+
+    private void resize(int capacity) {
+        ArrayMap<K, V>[] newBuckets = new ArrayMap[capacity];
+        for (int i = 0; i < newBuckets.length; i += 1) {
+            newBuckets[i] = new ArrayMap<>();
+        }
+        System.arraycopy(buckets, 0, newBuckets, 0, buckets.length);
+        buckets = newBuckets;
+    }
+
 
     /* Returns the number of key-value mappings in this map. */
     @Override
     public int size() {
-        throw new UnsupportedOperationException();
+        return size;
     }
 
     //////////////// EVERYTHING BELOW THIS LINE IS OPTIONAL ////////////////
@@ -73,7 +111,11 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     /* Returns a Set view of the keys contained in this map. */
     @Override
     public Set<K> keySet() {
-        throw new UnsupportedOperationException();
+        Set<K> ks = new HashSet<>();
+        for (int i = 0; i < buckets.length; i += 1) {
+            ks.addAll(buckets[i].keySet());
+        }
+        return ks;
     }
 
     /* Removes the mapping for the specified key from this map if exists.
@@ -81,7 +123,14 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * UnsupportedOperationException. */
     @Override
     public V remove(K key) {
-        throw new UnsupportedOperationException();
+        if (key == null) {
+            throw new IllegalArgumentException("Null key not allowed.");
+        }
+        int h = hash(key);
+        if (buckets[h].containsKey(key)) {
+            size -= 1;
+        }
+        return buckets[h].remove(key);
     }
 
     /* Removes the entry for the specified key only if it is currently mapped to
@@ -89,11 +138,21 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * throw an UnsupportedOperationException.*/
     @Override
     public V remove(K key, V value) {
-        throw new UnsupportedOperationException();
+        if (key == null) {
+            throw new IllegalArgumentException("Null key not allowed.");
+        }
+        if (value == null) {
+            throw new IllegalArgumentException("Null values not allowed.");
+        }
+        int h = hash(key);
+        if (buckets[h].containsKey(key) && buckets[h].get(key).equals(value)) {
+            size -= 1;
+        }
+        return buckets[h].remove(key, value);
     }
 
     @Override
     public Iterator<K> iterator() {
-        throw new UnsupportedOperationException();
+        return keySet().iterator();
     }
 }
