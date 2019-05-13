@@ -221,7 +221,7 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
             if (s.myItem.equals(item)) {
                 double original = s.myPriority;
                 s.myPriority = priority;
-                if (priority > original && leftIndex(i) < size) {
+                if (priority > original && leftIndex(i) <= size) {
                     sink(i);
                 } else if (priority < original && parentIndex(i) > 0) {
                     swim(i);
