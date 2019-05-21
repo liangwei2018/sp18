@@ -46,22 +46,20 @@ public class Babysitter {
     private int getHour(String s) {
         String hour;
         String minutes;
-        int lastIndex = s.length() - 2;
-        if (s.contains(" ")) {
-            lastIndex = s.indexOf(" ");
-        }
+
         if (s.contains(":")) {
             int colonIndex = s.indexOf(":");
             hour = s.substring(0, colonIndex);
-            minutes = s.substring(colonIndex + 1, lastIndex);
+            minutes = s.substring(colonIndex + 1, colonIndex + 3);
         } else {
+            int lastIndex = Math.max(s.indexOf("M"), s.indexOf("m")) - 1;
             hour = s.substring(0, lastIndex);
             minutes = "00";
         }
-        if (Integer.parseInt(minutes) > 0) {
-            throw new IllegalArgumentException("No fractional hours!");
+        if (Integer.parseInt(minutes.trim()) > 0) {
+            throw new IllegalArgumentException("Fractional hours!");
         }
-        int returnHour = Integer.parseInt(hour);
+        int returnHour = Integer.parseInt(hour.trim());
 
         boolean isPM = s.contains("pm") || s.contains("PM")
                 || s.contains("pM") || s.contains("Pm");

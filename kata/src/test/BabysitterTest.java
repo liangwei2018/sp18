@@ -40,7 +40,8 @@ public class BabysitterTest {
         assertTrue(thrown);
 
         thrown = false;
-        start = "4:00 am";
+        start = "12:00 pm";
+        end = "4:00 am";
         try {
             bb = new Babysitter(start, end);
         } catch (IllegalArgumentException e) {
