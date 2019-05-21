@@ -15,7 +15,7 @@ public class Babysitter {
     private int endHour;
 
     /**
-     * Constructor to initialize object with input parameters.
+     * Initializes object with input parameters.
      * @param s the start time string (e.g.: "hh:mm am", "hh:mm PM")
      * @param e the end time string
      * @param f the family type
@@ -107,7 +107,7 @@ public class Babysitter {
     }
 
     /**
-     * Compute the total payment the babysitter gets for working one night for a family
+     * Computes the total payment the babysitter gets for working one night for a family
      * family A B C are numbered as 1, 2, 3
      * @param i the ith family
      * @return the total payment

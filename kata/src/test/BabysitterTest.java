@@ -27,7 +27,7 @@ public class BabysitterTest {
         assertEquals(1, bb.getEndHour());
     }
 
-    /** test wrong start/end times */
+    /** Tests wrong start/end times */
     @Test
     public void testStartEndTimeException() {
         start = "4:00 pm";
@@ -50,7 +50,7 @@ public class BabysitterTest {
         assertTrue(thrown);
     }
 
-    /** test fractional times */
+    /** Tests fractional times */
     @Test
     public void testFractionalTimes() {
         start = "4:25 pm";
@@ -80,7 +80,7 @@ public class BabysitterTest {
         assertEquals(7, bb.getStartHour());
         assertEquals(12, bb.getEndHour());
     }
-    /** assuming start end time works  */
+    /** Assuming start end time works  */
     @Test
     public void testTotalPay() {
         start = "7 pm";
@@ -92,7 +92,7 @@ public class BabysitterTest {
 
     }
 
-    /** assuming start end time works  */
+    /** Assuming start end time works  */
     @Test
     public void testTotalPaySpecial() {
         start = "5:00 pm";
@@ -117,7 +117,7 @@ public class BabysitterTest {
         assertEquals(60, bb.getTotalPay(3));
     }
 
-    /** test wrong start/end time strings */
+    /** Tests wrong start/end time strings */
     @Test
     public void testWrongTimeStrings() {
         start = "3abc2 pm";
