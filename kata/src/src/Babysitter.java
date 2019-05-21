@@ -81,7 +81,7 @@ public class Babysitter {
      * @return the start time (hour)
      */
     public int getStartHour() {
-        return startHour % 12;
+        return startHour > 12? startHour - 12 : startHour;
     }
 
     /**
@@ -89,7 +89,7 @@ public class Babysitter {
      * @return the end time (hour)
      */
     public int getEndHour() {
-        return endHour % 12;
+        return endHour > 12? endHour - 12 : endHour;
     }
 
     /**

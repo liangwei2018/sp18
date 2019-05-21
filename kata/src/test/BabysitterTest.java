@@ -69,9 +69,17 @@ public class BabysitterTest {
         end = "0 AM";
         bb = new Babysitter(start, end);
         assertEquals(7, bb.getStartHour());
-        assertEquals(0, bb.getEndHour());
+        assertEquals(12, bb.getEndHour());
     }
 
+    @Test
+    public void testStartEndTimeSpecial() {
+        start = "7 pm";
+        end = "12 AM";
+        bb = new Babysitter(start, end);
+        assertEquals(7, bb.getStartHour());
+        assertEquals(12, bb.getEndHour());
+    }
     /** assuming start end time works  */
     @Test
     public void testTotalPay() {
