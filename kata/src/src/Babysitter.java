@@ -1,7 +1,5 @@
 package src;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Simulates a babysitter working and getting paid for one night.
@@ -18,8 +16,8 @@ public class Babysitter {
     private int family;
 
     /**
-     *
-     * @param s the start time string
+     * Constructor to initialize object with input parameters.
+     * @param s the start time string (e.g.: "hh:mm am", "hh:mm PM")
      * @param e the end time string
      * @param f the family type
      */
@@ -41,11 +39,18 @@ public class Babysitter {
     /**
      * Converts the time string s to hours.
      * Add 12 to AM Hours for comparison with PM Hours.
+     * Also accommodates time formats: e.g. 6pm, 6 PM, 3AM.
      * @param s the time string
      * @return the hour in int format
      */
     private int getHour(String s) {
-        String hour = s.substring(0, s.indexOf(":"));
+        String hour;
+        if (s.contains(":")) {
+            hour = s.substring(0, s.indexOf(":"));
+        } else {
+            int lastIndex = Math.min(s.indexOf(" "), s.length() - 2);
+            hour = s.substring(0, lastIndex);
+        }
         int returnHour = Integer.parseInt(hour);
         if (s.contains("am") || s.contains("AM")) {
             returnHour += 12;
