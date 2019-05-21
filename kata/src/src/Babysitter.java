@@ -90,6 +90,7 @@ public class Babysitter {
 
     /**
      * Gets the work start time (hour) between 5pm and 4am.
+     * Note that it returns 12 instead of 0 for midnight.
      * @return the start time (hour)
      */
     public int getStartHour() {
@@ -98,6 +99,7 @@ public class Babysitter {
 
     /**
      * Gets the work end time (hour) between 5pm and 4am.
+     * Note that it returns 12 instead of 0 for midnight.
      * @return the end time (hour)
      */
     public int getEndHour() {
@@ -106,6 +108,7 @@ public class Babysitter {
 
     /**
      * Compute the total payment the babysitter gets for working one night for a family
+     * family A B C are numbered as 1, 2, 3
      * @param i the ith family
      * @return the total payment
      */
