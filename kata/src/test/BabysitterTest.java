@@ -117,5 +117,37 @@ public class BabysitterTest {
         assertEquals(60, bb.getTotalPay(3));
     }
 
+    /** test wrong start/end time strings */
+    @Test
+    public void testWrongTimeStrings() {
+        start = "3abc2 pm";
+        end = "4:00 am";
+        try {
+            bb = new Babysitter(start, end);
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+
+        thrown = false;
+        start = "";
+        end = "3:00 am";
+        try {
+            bb = new Babysitter(start, end);
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+
+        thrown = false;
+        start = "-7:00 pm";
+        end = "12:00 am";
+        try {
+            bb = new Babysitter(start, end);
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+    }
 
 }

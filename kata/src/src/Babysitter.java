@@ -14,7 +14,6 @@ public class Babysitter {
     private int startHour;
     private int endHour;
 
-
     /**
      * Constructor to initialize object with input parameters.
      * @param s the start time string (e.g.: "hh:mm am", "hh:mm PM")
@@ -22,8 +21,8 @@ public class Babysitter {
      * @param f the family type
      */
     public Babysitter(String s, String e) {
-        if (s == null || e == null) {
-            throw new IllegalArgumentException("Null time string!");
+        if (s == null || e == null || s.isEmpty() || e.isEmpty()) {
+            throw new IllegalArgumentException("Null or empty time string!");
         }
         startHour = getHour(s);
         endHour = getHour(e);
@@ -45,24 +44,37 @@ public class Babysitter {
      */
     private int getHour(String s) {
         String hour;
-        String minutes;
+        String minute;
 
         if (s.contains(":")) {
             int colonIndex = s.indexOf(":");
             hour = s.substring(0, colonIndex);
-            minutes = s.substring(colonIndex + 1, colonIndex + 3);
+            minute = s.substring(colonIndex + 1, colonIndex + 3);
         } else {
             int lastIndex = Math.max(s.indexOf("M"), s.indexOf("m")) - 1;
+            if (lastIndex < 1) {
+                throw new IllegalArgumentException("Wrong time string!");
+            }
             hour = s.substring(0, lastIndex);
-            minutes = "00";
+            minute = "00";
         }
-        if (Integer.parseInt(minutes.trim()) > 0) {
+        /* remove leading and trailing white spaces
+         * check if hour/minute are all non negative numbers  */
+        hour = hour.trim();
+        minute = minute.trim();
+        if (!hour.matches("\\d+") || !minute.matches("\\d+")) {
+            throw new IllegalArgumentException("Wrong characters in hour or minute!");
+        }
+        if (Integer.parseInt(minute) > 0) {
             throw new IllegalArgumentException("Fractional hours!");
         }
-        int returnHour = Integer.parseInt(hour.trim());
 
+        int returnHour = Integer.parseInt(hour);
         boolean isPM = s.contains("pm") || s.contains("PM")
                 || s.contains("pM") || s.contains("Pm");
+
+        /* returns 0 for 12pm, 12 for 12 am, and rest AM hours + 12,
+         * for start/end time range (5pm to 4am) comparison. */
         if (returnHour == 12 && isPM) {
             return 0;
         }
@@ -81,7 +93,7 @@ public class Babysitter {
      * @return the start time (hour)
      */
     public int getStartHour() {
-        return startHour > 12? startHour - 12 : startHour;
+        return startHour > 12 ? startHour - 12 : startHour;
     }
 
     /**
@@ -89,7 +101,7 @@ public class Babysitter {
      * @return the end time (hour)
      */
     public int getEndHour() {
-        return endHour > 12? endHour - 12 : endHour;
+        return endHour > 12 ? endHour - 12 : endHour;
     }
 
     /**
