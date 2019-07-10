@@ -21,6 +21,9 @@ public class Solver {
      * @param initial a WorldState object.
      */
     public Solver(WorldState initial) {
+        if (initial == null) {
+            throw new IllegalArgumentException("WorldState object initial is null!");
+        }
         MinPQ<SearchNode> pq = new MinPQ<>();
         SearchNode initialNode = new SearchNode(initial, null);
         pq.insert(initialNode);
@@ -120,5 +123,5 @@ public class Solver {
     public Iterable<WorldState> solution() {
         return solutionList;
     }
-    
+
 }
