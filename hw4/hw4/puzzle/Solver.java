@@ -120,12 +120,5 @@ public class Solver {
     public Iterable<WorldState> solution() {
         return solutionList;
     }
-
-    /*
-    public void printStates() {
-        for (WorldState ws : solutionList) {
-            System.out.println(ws);
-        }
-    }
-    */
+    
 }
