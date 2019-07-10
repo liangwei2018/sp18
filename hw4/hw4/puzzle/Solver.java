@@ -55,7 +55,7 @@ public class Solver {
      * to reach this world state from the initial state, a reference
      * to the previous search node, and an estimated distance to goal.
      */
-    public class SearchNode implements Comparable<SearchNode> {
+    private class SearchNode implements Comparable<SearchNode> {
         WorldState init;
         int movesFromInitial;
         SearchNode prev;

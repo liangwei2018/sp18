@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class Board implements WorldState {
+public class Board implements WorldState {
 
     private final int[][] board;
     private final int[][] goal;
@@ -117,7 +117,7 @@ public final class Board implements WorldState {
         int differenceCount = 0;
         for (int i = 0; i < size; i += 1) {
             for (int j = 0; j < size; j += 1) {
-                if (board[i][j] != goal[i][j]) {
+                if (board[i][j] != goal[i][j] && board[i][j] != BLANK) {
                     differenceCount += 1;
                 }
             }
@@ -134,7 +134,7 @@ public final class Board implements WorldState {
         int sumDistance = 0;
         for (int i = 0; i < size; i += 1) {
             for (int j = 0; j < size; j += 1) {
-                if (board[i][j] != goal[i][j]) {
+                if (board[i][j] != goal[i][j] && board[i][j] != BLANK) {
                     int row = (board[i][j] - 1) / size;
                     int column = board[i][j] - 1 - row * size;
                     sumDistance += Math.abs(row - i) + Math.abs(column - j);
@@ -183,7 +183,7 @@ public final class Board implements WorldState {
 
     /** Returns the string representation of the board. 
       * Uncomment this method. */
-    /*public String toString() {
+    public String toString() {
         StringBuilder s = new StringBuilder();
         int N = size();
         s.append(N + "\n");
@@ -195,6 +195,6 @@ public final class Board implements WorldState {
         }
         s.append("\n");
         return s.toString();
-    }*/
+    }
 
 }
