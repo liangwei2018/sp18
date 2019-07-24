@@ -1,3 +1,4 @@
+import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 import org.xml.sax.SAXException;
 
 import java.io.File;
@@ -6,7 +7,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -20,6 +21,74 @@ import java.util.ArrayList;
 public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
+    private final Map<Long, Node> nodes = new LinkedHashMap<>();
+
+    /**
+     * A Node/Vertex, a single point in space defined by
+     * node id, longitude, and latitude.
+     */
+    static class Node {
+        long id;
+        double lat;
+        double lon;
+        Set<Node> adj;
+        Map<String, String> extraInfo;
+
+        Node(long id, double lat, double lon) {
+            this.id = id;
+            this.lat = lat;
+            this.lon = lon;
+            this.adj = new HashSet<>();
+            this.extraInfo = new HashMap<>();
+        }
+    }
+
+    void addNode(Node v) {
+        nodes.put(v.id, v);
+    }
+
+    Node getNode(long id) {
+        return nodes.get(id);
+    }
+
+    /*
+    static class Edge {
+        Node a;
+        Node b;
+        Edge(Node a, Node b) {
+            this.a = a;
+            this.b = b;
+        }
+    }*/
+
+    /**
+     * Add an Edge,  defined by connecting two nodes.
+     */
+    void addEdge(Node a, Node b) {
+        a.adj.add(b);
+        b.adj.add(a);
+    }
+
+    static class Way {
+        long id;
+        ArrayList<Node> nodeList;
+        boolean validHighway;
+        String maxSpeed;
+        Map<String, String> extraInfo;
+        Way(long id) {
+            this.id = id;
+            nodeList = new ArrayList<>();
+            validHighway = false;
+            maxSpeed = null;
+            extraInfo = new HashMap<>();
+        }
+        void clear() {
+            nodeList.clear();
+            validHighway = false;
+            maxSpeed = null;
+            extraInfo.clear();
+        }
+    }
 
     /**
      * Example constructor shows how to create and start an XML parser.
@@ -58,6 +127,14 @@ public class GraphDB {
      */
     private void clean() {
         // TODO: Your code here.
+        for (long id : nodes.keySet()) {
+            Node c = nodes.get(id);
+            if (c.adj.isEmpty()) {
+                nodes.remove(c);
+            }
+
+        }
+
     }
 
     /**
@@ -66,7 +143,8 @@ public class GraphDB {
      */
     Iterable<Long> vertices() {
         //YOUR CODE HERE, this currently returns only an empty list.
-        return new ArrayList<Long>();
+
+        return nodes.keySet();
     }
 
     /**
@@ -75,7 +153,22 @@ public class GraphDB {
      * @return An iterable of the ids of the neighbors of v.
      */
     Iterable<Long> adjacent(long v) {
-        return null;
+        validateVertex(v);
+        Set<Long> vertices = new HashSet<>();
+        for (Node c : nodes.get(v).adj) {
+            vertices.add(c.id);
+        }
+        return vertices;
+    }
+
+    /**
+     * Throw an IllegalArgumentException for negative vertex ids.
+     */
+
+    private void validateVertex(long v) {
+        if (v < 0) {
+            throw new IllegalArgumentException("vertex " + v + " is negative!");
+        }
     }
 
     /**
@@ -136,7 +229,23 @@ public class GraphDB {
      * @return The id of the node in the graph closest to the target.
      */
     long closest(double lon, double lat) {
-        return 0;
+        double nearest = Double.MAX_VALUE;
+        long givenId = Long.MAX_VALUE;
+        while (nodes.containsKey(givenId)) {
+            givenId -= 1;
+        }
+        Node givenNode = new GraphDB.Node(givenId, lat, lon);
+        nodes.put(givenId, givenNode);
+        long nodeId = 0;
+        for (long v : nodes.keySet()) {
+            double dis = distance(v, givenId);
+            if (dis < nearest && dis > 0) {
+                nearest = dis;
+                nodeId = v;
+            }
+        }
+        nodes.remove(givenId);
+        return nodeId;
     }
 
     /**
@@ -145,7 +254,7 @@ public class GraphDB {
      * @return The longitude of the vertex.
      */
     double lon(long v) {
-        return 0;
+        return nodes.get(v).lon;
     }
 
     /**
@@ -154,6 +263,6 @@ public class GraphDB {
      * @return The latitude of the vertex.
      */
     double lat(long v) {
-        return 0;
+        return nodes.get(v).lat;
     }
 }

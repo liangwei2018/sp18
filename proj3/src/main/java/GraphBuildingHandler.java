@@ -38,13 +38,18 @@ public class GraphBuildingHandler extends DefaultHandler {
                     "secondary_link", "tertiary_link"));
     private String activeState = "";
     private final GraphDB g;
+    private GraphDB.Node lastNode;
+    private GraphDB.Way osmWay;
 
     /**
      * Create a new GraphBuildingHandler.
      * @param g The graph to populate with the XML data.
      */
     public GraphBuildingHandler(GraphDB g) {
+
         this.g = g;
+        lastNode = null;
+        osmWay = null;
     }
 
     /**
@@ -74,11 +79,18 @@ public class GraphBuildingHandler extends DefaultHandler {
 
             /* TODO Use the above information to save a "node" to somewhere. */
             /* Hint: A graph-like structure would be nice. */
-
+            long id = Long.parseLong(attributes.getValue("id"));
+            double lat = Double.parseDouble(attributes.getValue("lat"));
+            double lon = Double.parseDouble(attributes.getValue("lon"));
+            GraphDB.Node c = new GraphDB.Node(id, lat, lon);
+            g.addNode(c);
+            lastNode = c;
         } else if (qName.equals("way")) {
             /* We encountered a new <way...> tag. */
             activeState = "way";
 //            System.out.println("Beginning a way...");
+            long id = Long.parseLong(attributes.getValue("id"));
+            osmWay = new GraphDB.Way(id);
         } else if (activeState.equals("way") && qName.equals("nd")) {
             /* While looking at a way, we found a <nd...> tag. */
             //System.out.println("Id of a node in this way: " + attributes.getValue("ref"));
@@ -89,6 +101,9 @@ public class GraphBuildingHandler extends DefaultHandler {
             cumbersome since you might have to remove the connections if you later see a tag that
             makes this way invalid. Instead, think of keeping a list of possible connections and
             remember whether this way is valid or not. */
+            long id = Long.parseLong(attributes.getValue("ref"));
+            osmWay.nodeList.add(g.getNode(id));
+
 
         } else if (activeState.equals("way") && qName.equals("tag")) {
             /* While looking at a way, we found a <tag...> tag. */
@@ -97,12 +112,17 @@ public class GraphBuildingHandler extends DefaultHandler {
             if (k.equals("maxspeed")) {
                 //System.out.println("Max Speed: " + v);
                 /* TODO set the max speed of the "current way" here. */
+                osmWay.maxSpeed = v;
             } else if (k.equals("highway")) {
                 //System.out.println("Highway type: " + v);
                 /* TODO Figure out whether this way and its connections are valid. */
                 /* Hint: Setting a "flag" is good enough! */
+                if (ALLOWED_HIGHWAY_TYPES.contains(v)) {
+                    osmWay.validHighway = true;
+                }
             } else if (k.equals("name")) {
                 //System.out.println("Way Name: " + v);
+                osmWay.extraInfo.put(k, v);
             }
 //            System.out.println("Tag with k=" + k + ", v=" + v + ".");
         } else if (activeState.equals("node") && qName.equals("tag") && attributes.getValue("k")
@@ -113,6 +133,7 @@ public class GraphBuildingHandler extends DefaultHandler {
             node this tag belongs to. Remember XML is parsed top-to-bottom, so probably it's the
             last node that you looked at (check the first if-case). */
 //            System.out.println("Node's name: " + attributes.getValue("v"));
+            lastNode.extraInfo.put(attributes.getValue("k"), attributes.getValue("v"));
         }
     }
 
@@ -134,6 +155,20 @@ public class GraphBuildingHandler extends DefaultHandler {
             /* Hint1: If you have stored the possible connections for this way, here's your
             chance to actually connect the nodes together if the way is valid. */
 //            System.out.println("Finishing a way...");
+            if (osmWay.validHighway) {
+                for (int i = 0; i < osmWay.nodeList.size() - 1; i += 1) {
+                    GraphDB.Node a = osmWay.nodeList.get(i);
+                    GraphDB.Node b = osmWay.nodeList.get(i + 1);
+                    g.addEdge(a, b);
+                }
+            }
+            osmWay.clear();
+            /*
+            osmWay.nodeList.clear();
+            osmWay.validHighway = false;
+            osmWay.maxSpeed = null;
+            osmWay.extraInfo = null;
+            */
         }
     }
 
