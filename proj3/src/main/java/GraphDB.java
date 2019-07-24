@@ -9,6 +9,8 @@ import javax.xml.parsers.SAXParserFactory;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.Map;
 
 
 
@@ -34,8 +36,8 @@ public class GraphDB {
         long id;
         double lat;
         double lon;
-        java.util.Set<GraphDB.Node> adj;
-        java.util.Map<String, String> extraInfo;
+        Set<GraphDB.Node> adj;
+        Map<String, String> extraInfo;
 
         Node(long id, double lat, double lon) {
             this.id = id;
@@ -67,19 +69,19 @@ public class GraphDB {
         long id;
         ArrayList<Node> nodeList;
         boolean validHighway;
-        String maxSpeed;
-        java.util.Map<String, String> extraInfo;
+        int maxSpeed;
+        Map<String, String> extraInfo;
         Way(long id) {
             this.id = id;
             nodeList = new ArrayList<>();
             validHighway = false;
-            maxSpeed = null;
+            maxSpeed = 0;
             extraInfo = new HashMap<>();
         }
         void clear() {
             nodeList.clear();
             validHighway = false;
-            maxSpeed = null;
+            maxSpeed = 0;
             extraInfo.clear();
         }
     }

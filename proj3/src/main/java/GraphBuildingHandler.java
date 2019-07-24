@@ -77,7 +77,7 @@ public class GraphBuildingHandler extends DefaultHandler {
 //            System.out.println("Node lon: " + attributes.getValue("lon"));
 //            System.out.println("Node lat: " + attributes.getValue("lat"));
 
-            /* TODO Use the above information to save a "node" to somewhere. */
+            /* TO DO Use the above information to save a "node" to somewhere. */
             /* Hint: A graph-like structure would be nice. */
             long id = Long.parseLong(attributes.getValue("id"));
             double lat = Double.parseDouble(attributes.getValue("lat"));
@@ -95,7 +95,7 @@ public class GraphBuildingHandler extends DefaultHandler {
             /* While looking at a way, we found a <nd...> tag. */
             //System.out.println("Id of a node in this way: " + attributes.getValue("ref"));
 
-            /* TODO Use the above id to make "possible" connections between the nodes in this way */
+            /* TO DO Use the above id to make "possible" connections between the nodes in this way */
             /* Hint1: It would be useful to remember what was the last node in this way. */
             /* Hint2: Not all ways are valid. So, directly connecting the nodes here would be
             cumbersome since you might have to remove the connections if you later see a tag that
@@ -111,11 +111,11 @@ public class GraphBuildingHandler extends DefaultHandler {
             String v = attributes.getValue("v");
             if (k.equals("maxspeed")) {
                 //System.out.println("Max Speed: " + v);
-                /* TODO set the max speed of the "current way" here. */
-                osmWay.maxSpeed = v;
+                /* TO DO set the max speed of the "current way" here. */
+                osmWay.maxSpeed = Integer.parseInt(v.replaceAll("[\\D]", ""));
             } else if (k.equals("highway")) {
                 //System.out.println("Highway type: " + v);
-                /* TODO Figure out whether this way and its connections are valid. */
+                /* TO DO Figure out whether this way and its connections are valid. */
                 /* Hint: Setting a "flag" is good enough! */
                 if (ALLOWED_HIGHWAY_TYPES.contains(v)) {
                     osmWay.validHighway = true;
