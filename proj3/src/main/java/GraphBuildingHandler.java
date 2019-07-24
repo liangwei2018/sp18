@@ -163,12 +163,6 @@ public class GraphBuildingHandler extends DefaultHandler {
                 }
             }
             osmWay.clear();
-            /*
-            osmWay.nodeList.clear();
-            osmWay.validHighway = false;
-            osmWay.maxSpeed = null;
-            osmWay.extraInfo = null;
-            */
         }
     }
 

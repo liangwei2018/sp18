@@ -1,4 +1,3 @@
-import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 import org.xml.sax.SAXException;
 
 import java.io.File;
@@ -7,7 +6,11 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.util.*;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.ArrayList;
+
+
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -21,7 +24,7 @@ import java.util.*;
 public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
-    private final Map<Long, Node> nodes = new LinkedHashMap<>();
+    private final java.util.Map<Long, GraphDB.Node> nodes = new HashMap<>();
 
     /**
      * A Node/Vertex, a single point in space defined by
@@ -31,8 +34,8 @@ public class GraphDB {
         long id;
         double lat;
         double lon;
-        Set<Node> adj;
-        Map<String, String> extraInfo;
+        java.util.Set<GraphDB.Node> adj;
+        java.util.Map<String, String> extraInfo;
 
         Node(long id, double lat, double lon) {
             this.id = id;
@@ -51,15 +54,6 @@ public class GraphDB {
         return nodes.get(id);
     }
 
-    /*
-    static class Edge {
-        Node a;
-        Node b;
-        Edge(Node a, Node b) {
-            this.a = a;
-            this.b = b;
-        }
-    }*/
 
     /**
      * Add an Edge,  defined by connecting two nodes.
@@ -74,7 +68,7 @@ public class GraphDB {
         ArrayList<Node> nodeList;
         boolean validHighway;
         String maxSpeed;
-        Map<String, String> extraInfo;
+        java.util.Map<String, String> extraInfo;
         Way(long id) {
             this.id = id;
             nodeList = new ArrayList<>();
@@ -126,13 +120,19 @@ public class GraphDB {
      *  we can reasonably assume this since typically roads are connected.
      */
     private void clean() {
-        // TODO: Your code here.
+        // TO DO: Your code here.
+        if (nodes.isEmpty()) {
+            throw new RuntimeException("Nodes null or empty!");
+        }
+        java.util.Set<Long> removeKeys = new HashSet<>();
         for (long id : nodes.keySet()) {
             Node c = nodes.get(id);
             if (c.adj.isEmpty()) {
-                nodes.remove(c);
+                removeKeys.add(id);
             }
-
+        }
+        for (long id : removeKeys) {
+            nodes.remove(id);
         }
 
     }
@@ -153,23 +153,13 @@ public class GraphDB {
      * @return An iterable of the ids of the neighbors of v.
      */
     Iterable<Long> adjacent(long v) {
-        validateVertex(v);
-        Set<Long> vertices = new HashSet<>();
+        java.util.Set<Long> vertices = new HashSet<>();
         for (Node c : nodes.get(v).adj) {
             vertices.add(c.id);
         }
         return vertices;
     }
 
-    /**
-     * Throw an IllegalArgumentException for negative vertex ids.
-     */
-
-    private void validateVertex(long v) {
-        if (v < 0) {
-            throw new IllegalArgumentException("vertex " + v + " is negative!");
-        }
-    }
 
     /**
      * Returns the great-circle distance between vertices v and w in miles.
