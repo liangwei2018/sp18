@@ -26,7 +26,7 @@ import java.util.Map;
 public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
-    private final java.util.Map<Long, GraphDB.Node> nodes = new HashMap<>();
+    private final Map<Long, GraphDB.Node> nodes = new HashMap<>();
 
     /**
      * A Node/Vertex, a single point in space defined by
@@ -56,7 +56,7 @@ public class GraphDB {
         return nodes.get(id);
     }
 
-
+    Node removeNode(long id) { return nodes.remove(id); }
     /**
      * Add an Edge,  defined by connecting two nodes.
      */
@@ -123,18 +123,18 @@ public class GraphDB {
      */
     private void clean() {
         // TO DO: Your code here.
-        if (nodes.isEmpty()) {
+        if (isEmpty()) {
             throw new RuntimeException("Nodes null or empty!");
         }
         java.util.Set<Long> removeKeys = new HashSet<>();
-        for (long id : nodes.keySet()) {
-            Node c = nodes.get(id);
+        for (long id : vertices()) {
+            Node c = getNode(id);
             if (c.adj.isEmpty()) {
                 removeKeys.add(id);
             }
         }
         for (long id : removeKeys) {
-            nodes.remove(id);
+            removeNode(id);
         }
 
     }
@@ -147,6 +147,16 @@ public class GraphDB {
         //YOUR CODE HERE, this currently returns only an empty list.
 
         return nodes.keySet();
+    }
+
+    /**
+     * Check if the graph is empty.
+     * @return true if the graph is empty, false otherwise.
+     */
+    boolean isEmpty() {
+        //YOUR CODE HERE, this currently returns only an empty list.
+
+        return nodes.isEmpty();
     }
 
     /**
@@ -221,22 +231,27 @@ public class GraphDB {
      * @return The id of the node in the graph closest to the target.
      */
     long closest(double lon, double lat) {
+        for (long v : vertices()) {
+            if (getNode(v).lon == lon && getNode(v).lat == lat) {
+                return v;
+            }
+        }
         double nearest = Double.MAX_VALUE;
         long givenId = Long.MAX_VALUE;
         while (nodes.containsKey(givenId)) {
             givenId -= 1;
         }
         Node givenNode = new GraphDB.Node(givenId, lat, lon);
-        nodes.put(givenId, givenNode);
+        addNode(givenNode);
         long nodeId = 0;
-        for (long v : nodes.keySet()) {
+        for (long v : vertices()) {
             double dis = distance(v, givenId);
             if (dis < nearest && dis > 0) {
                 nearest = dis;
                 nodeId = v;
             }
         }
-        nodes.remove(givenId);
+        removeNode(givenId);
         return nodeId;
     }
 
