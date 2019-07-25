@@ -56,7 +56,9 @@ public class GraphDB {
         return nodes.get(id);
     }
 
-    Node removeNode(long id) { return nodes.remove(id); }
+    Node removeNode(long id) {
+        return nodes.remove(id);
+    }
     /**
      * Add an Edge,  defined by connecting two nodes.
      */
