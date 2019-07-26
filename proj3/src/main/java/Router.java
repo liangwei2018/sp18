@@ -1,13 +1,13 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +33,6 @@ public class Router {
      * @return A list of node id's in the order visited on the shortest path.
      */
 
-
     public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
                                           double destlon, double destlat) {
         long stid = g.closest(stlon, stlat);
@@ -44,15 +43,17 @@ public class Router {
         }
 
         Map<Long, Double> distToSource = new HashMap<>();
+        Map<Long, Long> parent = new HashMap<>();
         Set<Long> marked = new HashSet<>();
         Queue<RouterNode> fringe = new PriorityQueue<>();
         for (long id : g.vertices()) {
             distToSource.put(id, Double.MAX_VALUE);
         }
         distToSource.put(stid, 0.0);
+        parent.put(stid, null);
 
-        RouterNode currentNode = new RouterNode(stid, 0, Double.MAX_VALUE, null);
-
+        double priority = Double.MAX_VALUE;
+        RouterNode currentNode = new RouterNode(stid, priority);
         fringe.add(currentNode);
 
         while (!fringe.isEmpty() && fringe.peek().getVertexId() != destid) {
@@ -65,69 +66,46 @@ public class Router {
                 marked.add(v);
                 for (long w : g.adjacent(v)) {
                     double edgeLength = g.distance(v, w);
-                    double newDistToStart = currentNode.distToStart + edgeLength;
-                    double disToGoal = g.distance(w, destid);
+                    double newDistToStart = distToSource.get(v) + edgeLength;
                     if (newDistToStart < distToSource.get(w)) {
                         distToSource.replace(w, newDistToStart);
-                        fringe.add(new RouterNode(w, newDistToStart, disToGoal, currentNode));
+                        parent.put(w, v);
+                        priority = newDistToStart + g.distance(w, destid);
+                        fringe.add(new RouterNode(w, priority));
                     }
-
                 }
             }
-
         }
 
-        List<Long> returnList = new ArrayList<>();
-        long goal = 0;
-        if (!fringe.isEmpty()) {
-            currentNode = fringe.poll();
-            goal = currentNode.getVertexId();
-        }
-        if (goal != destid) {
-            throw new RuntimeException("No route to destination!");
+        if (fringe.peek() == null || fringe.peek().getVertexId() != destid) {
+            throw new RuntimeException("No path to destination!");
         }
 
-        Stack<Long> routeReverse = new Stack<>();
-        routeReverse.push(destid);
-        while (currentNode.parent != null) {
-            long currentId = currentNode.parent.getVertexId();
-            routeReverse.push(currentId);
-            currentNode = currentNode.getParent();
+        LinkedList<Long> shortestPathList = new LinkedList<>();
+        Long currentId = destid;
+        while (currentId != null) {
+            shortestPathList.addFirst(currentId);
+            currentId = parent.get(currentId);
         }
-        while (!routeReverse.isEmpty()) {
-            returnList.add(routeReverse.pop());
-        }
-        return returnList;
+        return shortestPathList;
     }
 
     private static class RouterNode implements Comparable<RouterNode> {
         private long vertexId;
-        private double distToStart;
-        private double estimatedDistToDest;
-        private RouterNode parent;
+        private double priority;
 
-        RouterNode(long v, double distToS, double distToD, RouterNode prev) {
+        RouterNode(long v, double p) {
             vertexId = v;
-            distToStart = distToS;
-            estimatedDistToDest = distToD;
-            parent = prev;
+            priority = p;
         }
 
         long getVertexId() {
             return vertexId;
         }
 
-        RouterNode getParent() {
-            return parent;
-        }
-
         @Override
         public int compareTo(RouterNode o) {
-            return Double.compare(this.priority(), o.priority());
-        }
-
-        private double priority() {
-            return distToStart + estimatedDistToDest;
+            return Double.compare(this.priority, o.priority);
         }
     }
 
@@ -141,7 +119,65 @@ public class Router {
      * route.
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
-        return null; // FIXME
+        List<NavigationDirection> ndList = new ArrayList<>();
+        NavigationDirection nd = new NavigationDirection();
+        long startNodeId = route.get(0);
+        long wayId = g.getWayId(startNodeId);
+        //String wayName = g.getWay(wayId).getName();
+        String wayName = g.getWayName(startNodeId);
+        /*
+        if (wayName == null) {
+            wayName = NavigationDirection.UNKNOWN_ROAD;
+        }*/
+        nd.direction = NavigationDirection.START;
+        //nd.distance = 0;
+        nd.way = wayName;
+        //ndList.add(nd);
+
+        long prevNodeId = startNodeId;
+        int i = 1;
+        long currentNodeId = route.get(i);
+
+        while (i < route.size()) {
+
+            double wayLength = 0;
+            while (g.getWayId(currentNodeId) == wayId && i < route.size() - 1) {
+                wayLength += g.distance(currentNodeId, prevNodeId);
+                prevNodeId = currentNodeId;
+                i += 1;
+                currentNodeId = route.get(i);
+            }
+            nd.distance = wayLength;
+            ndList.add(nd);
+
+            wayId = g.getWayId(currentNodeId);
+            wayName = g.getWayName(currentNodeId);
+            /*
+            if (wayName == null) {
+                wayName = NavigationDirection.UNKNOWN_ROAD;
+            }*/
+            nd.way = wayName;
+            double angle = g.bearing(prevNodeId, currentNodeId);
+            if (angle <= 15 && angle > -15) {
+                nd.direction = NavigationDirection.STRAIGHT;
+            } else if (angle > 15 && angle <= 30) {
+                nd.direction = NavigationDirection.SLIGHT_RIGHT;
+            } else if (angle < -15 && angle >= -30) {
+                nd.direction = NavigationDirection.SLIGHT_LEFT;
+            } else if (angle > 30 && angle <= 100) {
+                nd.direction = NavigationDirection.RIGHT;
+            } else if (angle < -30 && angle >= -100) {
+                nd.direction = NavigationDirection.LEFT;
+            } else if (angle > 100) {
+                nd.direction = NavigationDirection.SHARP_RIGHT;
+            } else if (angle < -100) {
+                nd.direction = NavigationDirection.SHARP_LEFT;
+            }
+
+            //ndList.add(nd);
+
+        }
+        return ndList; // FIX ME
     }
 
 

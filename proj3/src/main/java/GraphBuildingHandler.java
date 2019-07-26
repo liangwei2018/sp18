@@ -95,14 +95,14 @@ public class GraphBuildingHandler extends DefaultHandler {
             /* While looking at a way, we found a <nd...> tag. */
             //System.out.println("Id of a node in this way: " + attributes.getValue("ref"));
 
-            /* TO DO Use the above id to make "possible" connections between the nodes in this way */
+            /* TO DO Use the above id to make "possible" connections between the nodes in this way*/
             /* Hint1: It would be useful to remember what was the last node in this way. */
             /* Hint2: Not all ways are valid. So, directly connecting the nodes here would be
             cumbersome since you might have to remove the connections if you later see a tag that
             makes this way invalid. Instead, think of keeping a list of possible connections and
             remember whether this way is valid or not. */
             long id = Long.parseLong(attributes.getValue("ref"));
-            osmWay.nodeList.add(g.getNode(id));
+            osmWay.nodeList.add(id);
 
 
         } else if (activeState.equals("way") && qName.equals("tag")) {
@@ -122,18 +122,19 @@ public class GraphBuildingHandler extends DefaultHandler {
                 }
             } else if (k.equals("name")) {
                 //System.out.println("Way Name: " + v);
-                osmWay.extraInfo.put(k, v);
+                osmWay.name = v;
             }
 //            System.out.println("Tag with k=" + k + ", v=" + v + ".");
         } else if (activeState.equals("node") && qName.equals("tag") && attributes.getValue("k")
                 .equals("name")) {
             /* While looking at a node, we found a <tag...> with k="name". */
-            /* TODO Create a location. */
+            /* TO DO Create a location. */
             /* Hint: Since we found this <tag...> INSIDE a node, we should probably remember which
             node this tag belongs to. Remember XML is parsed top-to-bottom, so probably it's the
             last node that you looked at (check the first if-case). */
 //            System.out.println("Node's name: " + attributes.getValue("v"));
-            lastNode.extraInfo.put(attributes.getValue("k"), attributes.getValue("v"));
+            lastNode.name = attributes.getValue("v");
+            g.replaceNode(lastNode);
         }
     }
 
@@ -156,10 +157,15 @@ public class GraphBuildingHandler extends DefaultHandler {
             chance to actually connect the nodes together if the way is valid. */
 //            System.out.println("Finishing a way...");
             if (osmWay.validHighway) {
+                long wayId = osmWay.id;
+                String wayName = osmWay.name;
+                int maxSpeed = osmWay.maxSpeed;
                 for (int i = 0; i < osmWay.nodeList.size() - 1; i += 1) {
-                    GraphDB.Node a = osmWay.nodeList.get(i);
-                    GraphDB.Node b = osmWay.nodeList.get(i + 1);
+                    long a = osmWay.nodeList.get(i);
+                    long b = osmWay.nodeList.get(i + 1);
                     g.addEdge(a, b);
+                    g.addWayToNode(a, wayId, wayName, maxSpeed);
+                    g.addWayToNode(b, wayId, wayName, maxSpeed);
                 }
             }
             osmWay.clear();

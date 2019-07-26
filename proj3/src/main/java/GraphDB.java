@@ -26,7 +26,9 @@ import java.util.Map;
 public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
-    private final Map<Long, GraphDB.Node> nodes = new HashMap<>();
+    private final Map<Long, Node> nodes = new HashMap<>();
+    //private final Map<Long, Long> nodeToWay = new HashMap<>();
+    //private final Map<Long, Way> ways = new HashMap<>();
 
     /**
      * A Node/Vertex, a single point in space defined by
@@ -36,20 +38,41 @@ public class GraphDB {
         long id;
         double lat;
         double lon;
+        String name;
         Set<GraphDB.Node> adj;
-        Map<String, String> extraInfo;
+        long wayId;
+        int wayMaxSpeed;
+        String wayName;
+
 
         Node(long id, double lat, double lon) {
             this.id = id;
             this.lat = lat;
             this.lon = lon;
             this.adj = new HashSet<>();
-            this.extraInfo = new HashMap<>();
+            this.name = null;
+            wayId = Long.MAX_VALUE;
+            wayMaxSpeed = 0;
+            wayName = "unknown road";
+
         }
     }
 
+    /**
+     * Add a node to the graph
+     * @param v the node
+     */
     void addNode(Node v) {
         nodes.put(v.id, v);
+    }
+
+    /**
+     * Replace a node in the graph. the new node
+     * has the same id as the one in the graph.
+     * @param v the new node
+     */
+    void replaceNode(Node v) {
+        nodes.replace(v.id, v);
     }
 
     Node getNode(long id) {
@@ -62,29 +85,101 @@ public class GraphDB {
     /**
      * Add an Edge,  defined by connecting two nodes.
      */
-    void addEdge(Node a, Node b) {
-        a.adj.add(b);
-        b.adj.add(a);
+    void addEdge(long a, long b) {
+        Node v = getNode(a);
+        Node w = getNode(b);
+        v.adj.add(w);
+        w.adj.add(v);
+        nodes.replace(a, v);
+        nodes.replace(b, w);
     }
+    /**
+     * Add a way where a node is located to the node.
+     */
+
+    void addWayToNode(long nodeId, long wayId, String name, int speed) {
+        Node v = getNode(nodeId);
+        v.wayId = wayId;
+        v.wayName = name;
+        v.wayMaxSpeed = speed;
+        nodes.replace(nodeId, v);
+    }
+
+    /**
+     * Returns the name of the way that the node id belongs to.
+     * @param id the id of the node
+     * @return its way name
+     */
+    String getWayName(long id) {
+        return getNode(id).wayName;
+    }
+
+    /**
+     * Returns the way that the node id belongs to
+     * @param id the id of the node.
+     * @return the way id.
+     */
+    long getWayId(long id) {
+        return getNode(id).wayId;
+    }
+
+    /**
+     * Returns the max speed of the way that
+     * the node id belongs to.
+     * @param id the id of the node
+     * @return the way.
+     */
+    int getWaySpeed(long id) {
+        return getNode(id).wayMaxSpeed;
+    }
+
+/**
+ * Add a way,  containing two or more nodes
+ *
+
+void addWay(long id, Way a) {
+    ways.put(id, a);
+}
+**
+ * Add a node to its way.
+ //* @param id the id of the node
+ //* @param w the way that the node id belongs.
+ *
+void addNodeToWay(long id, long w) {
+    nodeToWay.put(id, w);
+}*/
+
+    /**
+     * Returns the way id that the node belongs to
+     * @param id the id of the node
+     * @return the id of the way.
+     */
+
 
     static class Way {
         long id;
-        ArrayList<Node> nodeList;
+        ArrayList<Long> nodeList;
         boolean validHighway;
         int maxSpeed;
-        Map<String, String> extraInfo;
+        String name;
         Way(long id) {
             this.id = id;
             nodeList = new ArrayList<>();
             validHighway = false;
             maxSpeed = 0;
-            extraInfo = new HashMap<>();
+            name = "unknown name";
+        }
+        long getId() {
+            return id;
+        }
+        String getName() {
+            return name;
         }
         void clear() {
             nodeList.clear();
             validHighway = false;
             maxSpeed = 0;
-            extraInfo.clear();
+            name = null;
         }
     }
 
