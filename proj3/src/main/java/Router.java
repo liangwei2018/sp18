@@ -44,7 +44,7 @@ public class Router {
 
         Map<Long, Double> distToSource = new HashMap<>();
         Map<Long, Long> parent = new HashMap<>();
-        Set<Long> marked = new HashSet<>();
+        //Set<Long> marked = new HashSet<>();
         Queue<RouterNode> fringe = new PriorityQueue<>();
         for (long id : g.vertices()) {
             distToSource.put(id, Double.MAX_VALUE);
@@ -62,30 +62,30 @@ public class Router {
             if (currentNode != null) {
                 v = currentNode.getVertexId();
             }
-            if (!marked.contains(v)) {
-                marked.add(v);
-                for (long w : g.adjacent(v)) {
-                    double edgeLength = g.distance(v, w);
-                    double newDistToStart = distToSource.get(v) + edgeLength;
-                    if (newDistToStart < distToSource.get(w)) {
-                        distToSource.replace(w, newDistToStart);
-                        parent.put(w, v);
-                        priority = newDistToStart + g.distance(w, destid);
-                        fringe.add(new RouterNode(w, priority));
-                    }
+            //if (!marked.contains(v)) {
+                //marked.add(v);
+            for (long w : g.adjacent(v)) {
+                double edgeLength = g.distance(v, w);
+                double newDistToStart = distToSource.get(v) + edgeLength;
+                if (newDistToStart < distToSource.get(w)) {
+                    distToSource.replace(w, newDistToStart);
+                    parent.put(w, v);
+                    priority = newDistToStart + g.distance(w, destid);
+                    fringe.add(new RouterNode(w, priority));
                 }
             }
+            //}
         }
 
         if (fringe.peek() == null) {
             System.out.println("Current Node ID:" + currentNode.getVertexId()
-                    + "  priority:" + priority +" Dest ID:" + destid);
+                    + "  priority:" + priority + " Dest ID:" + destid);
             throw new RuntimeException("Null fringe!");
         }
 
         if (fringe.peek().getVertexId() != destid) {
             System.out.println("Current Node ID:" + currentNode.getVertexId()
-                    + "  priority:" + priority +" Dest ID:" + destid);
+                    + "  priority:" + priority + " Dest ID:" + destid);
             throw new RuntimeException("No path to destination!");
         }
 
