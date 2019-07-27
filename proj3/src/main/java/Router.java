@@ -77,7 +77,15 @@ public class Router {
             }
         }
 
-        if (fringe.peek() == null || fringe.peek().getVertexId() != destid) {
+        if (fringe.peek() == null) {
+            System.out.println("Current Node ID:" + currentNode.getVertexId()
+                    + "  priority:" + priority +" Dest ID:" + destid);
+            throw new RuntimeException("Null fringe!");
+        }
+
+        if (fringe.peek().getVertexId() != destid) {
+            System.out.println("Current Node ID:" + currentNode.getVertexId()
+                    + "  priority:" + priority +" Dest ID:" + destid);
             throw new RuntimeException("No path to destination!");
         }
 
