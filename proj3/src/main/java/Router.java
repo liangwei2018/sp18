@@ -44,7 +44,7 @@ public class Router {
 
         Map<Long, Double> distToSource = new HashMap<>();
         Map<Long, Long> parent = new HashMap<>();
-        //Set<Long> marked = new HashSet<>();
+        Set<Long> marked = new HashSet<>();
         Queue<RouterNode> fringe = new PriorityQueue<>();
         for (long id : g.vertices()) {
             distToSource.put(id, Double.MAX_VALUE);
@@ -56,41 +56,42 @@ public class Router {
         RouterNode currentNode = new RouterNode(stid, priority);
         fringe.add(currentNode);
 
+        long v = stid;
+
         while (!fringe.isEmpty() && fringe.peek().getVertexId() != destid) {
             currentNode = fringe.poll();
-            long v = 0;
             if (currentNode != null) {
                 v = currentNode.getVertexId();
             }
-            //if (!marked.contains(v)) {
-                //marked.add(v);
-            for (long w : g.adjacent(v)) {
-                double edgeLength = g.distance(v, w);
-                double newDistToStart = distToSource.get(v) + edgeLength;
-                if (newDistToStart < distToSource.get(w)) {
-                    distToSource.replace(w, newDistToStart);
-                    parent.put(w, v);
-                    priority = newDistToStart + g.distance(w, destid);
-                    fringe.add(new RouterNode(w, priority));
+            if (!marked.contains(v)) {
+                marked.add(v);
+                for (long w : g.adjacent(v)) {
+                    double edgeLength = g.distance(v, w);
+                    double newDistToStart = distToSource.get(v) + edgeLength;
+                    if (newDistToStart < distToSource.get(w)) {
+                        distToSource.replace(w, newDistToStart);
+                        parent.put(w, v);
+                        priority = newDistToStart + g.distance(w, destid);
+                        currentNode = new RouterNode(w, priority);
+                        fringe.add(currentNode);
+                    }
                 }
             }
-            //}
         }
-
         if (fringe.peek() == null) {
-            System.out.println("Current Node ID:" + currentNode.getVertexId()
-                    + "  priority:" + priority + " Dest ID:" + destid);
-            throw new RuntimeException("Null fringe!");
-        }
-
-        if (fringe.peek().getVertexId() != destid) {
-            System.out.println("Current Node ID:" + currentNode.getVertexId()
-                    + "  priority:" + priority + " Dest ID:" + destid);
-            throw new RuntimeException("No path to destination!");
+            System.out.println("No path to destination!");
+            if (currentNode != null) {
+                v = currentNode.getVertexId();
+                System.out.println("The closest reachable Node to the destination:"
+                        + v + " Distance to Destination:" + g.distance(v, destid));
+            }
+            //throw new RuntimeException("No path to destination!");
+        } else {
+            v = fringe.peek().getVertexId();
         }
 
         LinkedList<Long> shortestPathList = new LinkedList<>();
-        Long currentId = destid;
+        Long currentId = v;
         while (currentId != null) {
             shortestPathList.addFirst(currentId);
             currentId = parent.get(currentId);
