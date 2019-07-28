@@ -128,68 +128,105 @@ public class Router {
      * route.
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
+        if (route.size() < 2) {
+            System.out.println("Route size < 2!");
+            return null;
+        }
         List<NavigationDirection> ndList = new ArrayList<>();
-        NavigationDirection nd = new NavigationDirection();
-        long startNodeId = route.get(0);
-        long wayId = g.getWayId(startNodeId);
-        //String wayName = g.getWay(wayId).getName();
-        String wayName = g.getWayName(startNodeId);
-        /*
-        if (wayName == null) {
-            wayName = NavigationDirection.UNKNOWN_ROAD;
-        }*/
-        nd.direction = NavigationDirection.START;
-        //nd.distance = 0;
-        nd.way = wayName;
-        //ndList.add(nd);
 
-        long prevNodeId = startNodeId;
+
+        double prevAngle = 0;
+        int dir = NavigationDirection.START;
+
+        int routeSize = route.size();
+        long[] node = new long[routeSize];
+        for (int i = 0; i < routeSize; i += 1) {
+            node[i] = route.get(i);
+        }
+
         int i = 1;
-        long currentNodeId = route.get(i);
+        while (i < routeSize) {
 
-        while (i < route.size()) {
+            String wayName = "";
+            Set<String> prevWayNames = g.getWayName(node[i - 1]);
+            Set<String> currentWayNames =g.getWayName(node[i]);
+            boolean sameWay = false;
+            for (String p : prevWayNames) {
+                if (currentWayNames.contains(p)) {
+                    sameWay = true;
+                    break;
+                }
+            }
 
             double wayLength = 0;
-            while (g.getWayId(currentNodeId) == wayId && i < route.size() - 1) {
-                wayLength += g.distance(currentNodeId, prevNodeId);
-                prevNodeId = currentNodeId;
+            while (sameWay) {
+                wayLength += g.distance(node[i - 1], node[i]);
                 i += 1;
-                currentNodeId = route.get(i);
+                if (i > routeSize - 1) {
+                    break;
+                }
+                currentWayNames = g.getWayName(node[i]);
+                if (prevWayNames.size() == 1) {
+                    for (String s : prevWayNames) {
+                        wayName = s;
+                        sameWay = currentWayNames.contains(wayName);
+                    }
+                } else {
+                    for (String p : prevWayNames) {
+                        if (currentWayNames.contains(p)) {
+                            sameWay = true;
+                            break;
+                        }
+                    }
+                }
             }
+
+            NavigationDirection nd = new NavigationDirection();
+            nd.way = wayName;
             nd.distance = wayLength;
+            nd.direction = dir;
             ndList.add(nd);
 
-            wayId = g.getWayId(currentNodeId);
-            wayName = g.getWayName(currentNodeId);
-            /*
-            if (wayName == null) {
-                wayName = NavigationDirection.UNKNOWN_ROAD;
-            }*/
-            nd.way = wayName;
-            double angle = g.bearing(prevNodeId, currentNodeId);
-            if (angle <= 15 && angle > -15) {
-                nd.direction = NavigationDirection.STRAIGHT;
-            } else if (angle > 15 && angle <= 30) {
-                nd.direction = NavigationDirection.SLIGHT_RIGHT;
-            } else if (angle < -15 && angle >= -30) {
-                nd.direction = NavigationDirection.SLIGHT_LEFT;
-            } else if (angle > 30 && angle <= 100) {
-                nd.direction = NavigationDirection.RIGHT;
-            } else if (angle < -30 && angle >= -100) {
-                nd.direction = NavigationDirection.LEFT;
-            } else if (angle > 100) {
-                nd.direction = NavigationDirection.SHARP_RIGHT;
-            } else if (angle < -100) {
-                nd.direction = NavigationDirection.SHARP_LEFT;
+            if (i > 1) {
+                prevAngle = g.bearing(node[i - 2], node[i - 1]);
             }
-
-            //ndList.add(nd);
+            if (i < routeSize) {
+                double currentAngle = g.bearing(node[i - 1], node[i]);
+                double angle = currentAngle - prevAngle;
+                dir = getDirection(angle);
+                i += 1;
+            }
 
         }
         return ndList; // FIX ME
     }
 
 
+    private static int getDirection(double angle) {
+        int dir = 0;
+        if (angle > 180) {
+            angle = angle - 360;
+        } else if (angle < -180) {
+            angle = angle + 360;
+        }
+
+        if (angle <= 15 && angle > -15) {
+            dir = NavigationDirection.STRAIGHT;
+        } else if (angle > 15 && angle <= 30) {
+            dir = NavigationDirection.SLIGHT_RIGHT;
+        } else if (angle < -15 && angle >= -30) {
+            dir = NavigationDirection.SLIGHT_LEFT;
+        } else if (angle > 30 && angle <= 100) {
+            dir = NavigationDirection.RIGHT;
+        } else if (angle < -30 && angle >= -100) {
+            dir = NavigationDirection.LEFT;
+        } else if (angle > 100) {
+            dir = NavigationDirection.SHARP_RIGHT;
+        } else if (angle < -100) {
+            dir = NavigationDirection.SHARP_LEFT;
+        }
+        return dir;
+    }
     /**
      * Class to represent a navigation direction, which consists of 3 attributes:
      * a direction to go, a way, and the distance to travel for.

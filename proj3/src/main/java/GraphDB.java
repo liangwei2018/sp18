@@ -40,9 +40,9 @@ public class GraphDB {
         double lon;
         String name;
         Set<GraphDB.Node> adj;
-        long wayId;
-        int wayMaxSpeed;
-        String wayName;
+        //Set<Long> wayId;
+        Set<String> wayName;
+        //Set<Integer> wayMaxSpeed;
 
 
         Node(long id, double lat, double lon) {
@@ -51,9 +51,9 @@ public class GraphDB {
             this.lon = lon;
             this.adj = new HashSet<>();
             this.name = null;
-            wayId = Long.MAX_VALUE;
-            wayMaxSpeed = 0;
-            wayName = "unknown road";
+            //wayId = new HashSet<>();
+            //wayMaxSpeed = new HashSet<>();
+            wayName = new HashSet<>();
 
         }
     }
@@ -99,9 +99,9 @@ public class GraphDB {
 
     void addWayToNode(long nodeId, long wayId, String name, int speed) {
         Node v = getNode(nodeId);
-        v.wayId = wayId;
-        v.wayName = name;
-        v.wayMaxSpeed = speed;
+        //v.wayId.add(wayId);
+        v.wayName.add(name);
+        //v.wayMaxSpeed.add(speed);
         nodes.replace(nodeId, v);
     }
 
@@ -110,50 +110,9 @@ public class GraphDB {
      * @param id the id of the node
      * @return its way name
      */
-    String getWayName(long id) {
+    Set<String> getWayName(long id) {
         return getNode(id).wayName;
     }
-
-    /**
-     * Returns the way that the node id belongs to
-     * @param id the id of the node.
-     * @return the way id.
-     */
-    long getWayId(long id) {
-        return getNode(id).wayId;
-    }
-
-    /**
-     * Returns the max speed of the way that
-     * the node id belongs to.
-     * @param id the id of the node
-     * @return the way.
-     */
-    int getWaySpeed(long id) {
-        return getNode(id).wayMaxSpeed;
-    }
-
-/**
- * Add a way,  containing two or more nodes
- *
-
-void addWay(long id, Way a) {
-    ways.put(id, a);
-}
-**
- * Add a node to its way.
- //* @param id the id of the node
- //* @param w the way that the node id belongs.
- *
-void addNodeToWay(long id, long w) {
-    nodeToWay.put(id, w);
-}*/
-
-    /**
-     * Returns the way id that the node belongs to
-     * @param id the id of the node
-     * @return the id of the way.
-     */
 
 
     static class Way {
@@ -167,7 +126,7 @@ void addNodeToWay(long id, long w) {
             nodeList = new ArrayList<>();
             validHighway = false;
             maxSpeed = 0;
-            name = "unknown name";
+            name = "unknown road";
         }
         long getId() {
             return id;
