@@ -144,6 +144,62 @@ public class Router {
             node[i] = route.get(i);
         }
 
+
+
+        for (int i = 1; i < routeSize; i += 1) {
+            Set<String> prevWayNames = g.getWayName(node[i - 1]);
+            String wayName = "";
+            if (!prevWayNames.isEmpty()) {
+                wayName = prevWayNames.iterator().next();
+            }
+            prevWayNames.retainAll(g.getWayName(node[i]));
+
+
+            boolean assignWayName = true;
+            double wayLength = 0.0;
+            int wayStart = i - 1;
+
+            while (i < routeSize && !prevWayNames.isEmpty()) {
+                wayLength += g.distance(node[i - 1], node[i]);
+
+                if (assignWayName && !prevWayNames.isEmpty()
+                        && prevWayNames.size() == 1) {
+                    wayName = prevWayNames.iterator().next();
+                    assignWayName = false;
+                }
+                i += 1;
+                if (i < routeSize) {
+                    prevWayNames.retainAll(g.getWayName(node[i]));
+                }
+            }
+            if (wayLength == 0) {
+                wayLength = g.distance(wayStart, wayStart + 1);
+            }
+            NavigationDirection nd = new NavigationDirection();
+            nd.way = wayName;
+            nd.distance = wayLength;
+            nd.direction = dir;
+            ndList.add(nd);
+
+            if (i > 1) {
+                prevAngle = g.bearing(node[i - 2], node[i - 1]);
+            }
+            if (i < routeSize) {
+                double currentAngle = g.bearing(node[i - 1], node[i]);
+                double angle = currentAngle - prevAngle;
+                dir = getDirection(angle);
+            }
+            if (i == routeSize - 1) {
+                nd.way = g.getWayName(i).iterator().next();
+                nd.distance = g.distance(i - 1, i);;
+                nd.direction = dir;
+                ndList.add(nd);
+            }
+        }
+
+
+
+ /*
         int i = 1;
         while (i < routeSize) {
 
@@ -197,7 +253,7 @@ public class Router {
                 i += 1;
             }
 
-        }
+        }*/
         return ndList; // FIX ME
     }
 
