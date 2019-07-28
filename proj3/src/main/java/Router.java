@@ -128,12 +128,15 @@ public class Router {
      * route.
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
+        if (g == null || g.isEmpty()) {
+            throw new IllegalArgumentException("Graph is null or empty!");
+        }
         if (route.size() < 2) {
             System.out.println("Route size < 2!");
             return null;
         }
-        List<NavigationDirection> ndList = new ArrayList<>();
 
+        List<NavigationDirection> ndList = new ArrayList<>();
 
         double prevAngle = 0;
         int dir = NavigationDirection.START;
@@ -151,8 +154,11 @@ public class Router {
             String wayName = "";
             if (!prevWayNames.isEmpty()) {
                 wayName = prevWayNames.iterator().next();
+                prevWayNames.retainAll(g.getWayName(node[i]));
+            } else {
+                prevWayNames = g.getWayName(node[i]);
             }
-            prevWayNames.retainAll(g.getWayName(node[i]));
+
 
 
             boolean assignWayName = true;
@@ -197,63 +203,6 @@ public class Router {
             }
         }
 
-
-
- /*
-        int i = 1;
-        while (i < routeSize) {
-
-            String wayName = "";
-            Set<String> prevWayNames = g.getWayName(node[i - 1]);
-            Set<String> currentWayNames =g.getWayName(node[i]);
-            boolean sameWay = false;
-            for (String p : prevWayNames) {
-                if (currentWayNames.contains(p)) {
-                    sameWay = true;
-                    break;
-                }
-            }
-
-            double wayLength = 0;
-            while (sameWay) {
-                wayLength += g.distance(node[i - 1], node[i]);
-                i += 1;
-                if (i > routeSize - 1) {
-                    break;
-                }
-                currentWayNames = g.getWayName(node[i]);
-                if (prevWayNames.size() == 1) {
-                    for (String s : prevWayNames) {
-                        wayName = s;
-                        sameWay = currentWayNames.contains(wayName);
-                    }
-                } else {
-                    for (String p : prevWayNames) {
-                        if (currentWayNames.contains(p)) {
-                            sameWay = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            NavigationDirection nd = new NavigationDirection();
-            nd.way = wayName;
-            nd.distance = wayLength;
-            nd.direction = dir;
-            ndList.add(nd);
-
-            if (i > 1) {
-                prevAngle = g.bearing(node[i - 2], node[i - 1]);
-            }
-            if (i < routeSize) {
-                double currentAngle = g.bearing(node[i - 1], node[i]);
-                double angle = currentAngle - prevAngle;
-                dir = getDirection(angle);
-                i += 1;
-            }
-
-        }*/
         return ndList; // FIX ME
     }
 
