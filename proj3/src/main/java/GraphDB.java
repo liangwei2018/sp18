@@ -56,6 +56,12 @@ public class GraphDB {
             wayName = new HashSet<>();
 
         }
+        String getNodeName() {
+            return name;
+        }
+        String getCleanNodeName() {
+            return GraphDB.cleanString(name);
+        }
     }
 
     /**
@@ -75,10 +81,29 @@ public class GraphDB {
         nodes.replace(v.id, v);
     }
 
+    /**
+     *
+     * @param id the id key
+     * @return the node that the specified id is associated with.
+     */
+
     Node getNode(long id) {
         return nodes.get(id);
     }
 
+    /**
+     *
+     * @return all nodes in the graph
+     */
+    Iterable<Node> getAllNodes() {
+        return nodes.values();
+    }
+
+    /**
+     * Remove a specified Node
+     * @param id the id key
+     * @return the specified Node associated with the id.
+     */
     Node removeNode(long id) {
         return nodes.remove(id);
     }
@@ -180,7 +205,8 @@ public class GraphDB {
     private void clean() {
         // TO DO: Your code here.
         if (isEmpty()) {
-            throw new RuntimeException("Nodes null or empty!");
+            return;
+            //throw new RuntimeException("Nodes null or empty!");
         }
         java.util.Set<Long> removeKeys = new HashSet<>();
         for (long id : vertices()) {

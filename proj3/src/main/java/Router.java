@@ -35,11 +35,16 @@ public class Router {
 
     public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
                                           double destlon, double destlat) {
+        if (g == null || g.isEmpty()) {
+            return null;
+            //throw new IllegalArgumentException("Graph is null or empty!");
+        }
         long stid = g.closest(stlon, stlat);
         long destid = g.closest(destlon, destlat);
 
         if (stid == destid) {
-            throw new IllegalArgumentException("Start and destination locations are the same!");
+            return null;
+            //throw new IllegalArgumentException("Start and destination locations are the same!");
         }
 
         Map<Long, Double> distToSource = new HashMap<>();
@@ -129,7 +134,8 @@ public class Router {
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
         if (g == null || g.isEmpty()) {
-            throw new IllegalArgumentException("Graph is null or empty!");
+            return null;
+            //throw new IllegalArgumentException("Graph is null or empty!");
         }
         if (route.size() < 2) {
             System.out.println("Route size < 2!");
