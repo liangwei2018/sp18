@@ -9,6 +9,9 @@ import javax.xml.parsers.SAXParserFactory;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.Map;
 
@@ -186,6 +189,84 @@ public class GraphDB {
             e.printStackTrace();
         }
         clean();
+    }
+
+    /**
+     * In linear time, collect all the names of OSM locations that prefix-match the query string.
+     * @param prefix Prefix string to be searched for. Could be any case, with or without
+     *               punctuation.
+     * @return A <code>List</code> of the full names of locations whose cleaned name matches the
+     * cleaned <code>prefix</code>.
+     */
+    public List<String> getLocationsByPrefix(String prefix) {
+
+        if (prefix == null || prefix.isEmpty()) {
+            return null;
+        }
+        List<String> returnList = new LinkedList<>();
+        List<String> totalMatchNames = new LinkedList<>();
+
+        TriSet triNames = new TriSet();
+        Random rand = new Random();
+        for (GraphDB.Node location : getAllNodes()) {
+            String name = location.getNodeName();
+            if (name == null) {
+                continue;
+            }
+            String cleanName = GraphDB.cleanString(name);
+            if (cleanName.startsWith(prefix)) {
+                triNames.put(cleanName, rand.nextInt(50) + 1);
+                totalMatchNames.add(name);
+            }
+        }
+        List<String> pList = triNames.keysWithPrefix(prefix);
+        for (String topName : pList) {
+            for (String matchName : totalMatchNames) {
+                String cleanName = GraphDB.cleanString(matchName);
+                if (topName.equals(cleanName)) {
+                    returnList.add(matchName);
+                    break;
+                }
+            }
+        }
+
+        return returnList;
+    }
+
+    /**
+     * Collect all locations that match a cleaned <code>locationName</code>, and return
+     * information about each node that matches.
+     * @param locationName A full name of a location searched for.
+     * @return A list of locations whose cleaned name matches the
+     * cleaned <code>locationName</code>, and each location is a map of parameters for the Json
+     * response as specified: <br>
+     * "lat" : Number, The latitude of the node. <br>
+     * "lon" : Number, The longitude of the node. <br>
+     * "name" : String, The actual name of the node. <br>
+     * "id" : Number, The id of the node. <br>
+     */
+    public List<Map<String, Object>> getLocations(String locationName) {
+        if (locationName == null || locationName.isEmpty()) {
+            return null;
+        }
+        List<Map<String, Object>> nodeMapList = new LinkedList<>();
+        for (GraphDB.Node node : getAllNodes()) {
+            String name = node.getNodeName();
+            if (name == null) {
+                continue;
+            }
+            String cleanName = GraphDB.cleanString(name);
+            String cleanLocationName = GraphDB.cleanString(locationName);
+            if (cleanName.equals(cleanLocationName)) {
+                Map<String, Object> nodeMap = new HashMap<>();
+                nodeMap.put("lat", node.lat);
+                nodeMap.put("lon", node.lon);
+                nodeMap.put("name", node.name);
+                nodeMap.put("id", node.id);
+                nodeMapList.add(nodeMap);
+            }
+        }
+        return nodeMapList;
     }
 
     /**

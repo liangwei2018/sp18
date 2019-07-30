@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
@@ -287,37 +286,7 @@ public class MapServer {
      */
     public static List<String> getLocationsByPrefix(String prefix) {
 
-        if (prefix == null || prefix.isEmpty()) {
-            return null;
-        }
-        List<String> returnList = new LinkedList<>();
-        List<String> totalMatchNames = new LinkedList<>();
-
-        TriSet triNames = new TriSet();
-        Random rand = new Random();
-        for (GraphDB.Node location : graph.getAllNodes()) {
-            String name = location.getNodeName();
-            if (name == null) {
-                continue;
-            }
-            String cleanName = GraphDB.cleanString(name);
-            if (cleanName.startsWith(prefix)) {
-                triNames.put(cleanName, rand.nextInt(50) + 1);
-                totalMatchNames.add(name);
-            }
-        }
-        List<String> pList = triNames.keysWithPrefix(prefix);
-        for (String topName : pList) {
-            for (String matchName : totalMatchNames) {
-                String cleanName = GraphDB.cleanString(matchName);
-                if (topName.equals(cleanName)) {
-                    returnList.add(matchName);
-                    break;
-                }
-            }
-        }
-
-        return returnList;
+        return graph.getLocationsByPrefix(prefix);
     }
 
     /**
@@ -333,27 +302,7 @@ public class MapServer {
      * "id" : Number, The id of the node. <br>
      */
     public static List<Map<String, Object>> getLocations(String locationName) {
-        if (locationName == null || locationName.isEmpty()) {
-            return null;
-        }
-        List<Map<String, Object>> nodeMapList = new LinkedList<>();
-        for (GraphDB.Node node : graph.getAllNodes()) {
-            String name = node.getNodeName();
-            if (name == null) {
-                continue;
-            }
-            String cleanName = GraphDB.cleanString(name);
-            String cleanLocationName = GraphDB.cleanString(locationName);
-            if (cleanName.equals(cleanLocationName)) {
-                Map<String, Object> nodeMap = new HashMap<>();
-                nodeMap.put("lat", node.lat);
-                nodeMap.put("lon", node.lon);
-                nodeMap.put("name", node.name);
-                nodeMap.put("id", node.id);
-                nodeMapList.add(nodeMap);
-            }
-        }
-        return nodeMapList;
+        return graph.getLocations(locationName);
     }
 
     /**

@@ -165,10 +165,19 @@ public class TriSet {
         if (s == null || s.isEmpty()) {
             return null;
         }
-        Node sNode = getHelp(root, s, s.length());
-        if (sNode == null) {
-            return null;
+        Node sNode = new Node();
+        if (!root.next.isEmpty()) {
+            sNode = root.next.get(s.charAt(0));
         }
+        for (int i = 1; i < s.length(); i += 1) {
+            if (sNode == null) {
+                return null;
+            }
+            sNode = sNode.next.get(s.charAt(i));
+            System.out.println("sNode.ch:" + sNode.ch);
+        }
+
+
                 /*root.next.get(s.charAt(0));
         for (int i = 1; i < s.length(); i += 1) {
             sNode = sNode.next.get(s.charAt(i));
@@ -178,8 +187,9 @@ public class TriSet {
         StringBuilder t = new StringBuilder(s);
         Queue<Node> pq = new PriorityQueue<>();
         //StringBuilder temp = t;
-
-        pq.addAll(sNode.next.values());
+        if (!sNode.next.isEmpty()) {
+            pq.addAll(sNode.next.values());
+        }
         int num = 0;
         while (!pq.isEmpty()) {
             Node topNode = pq.poll();
