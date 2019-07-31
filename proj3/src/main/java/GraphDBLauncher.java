@@ -8,6 +8,7 @@ import java.util.ArrayList;
  */
 public class GraphDBLauncher {
     private static final String OSM_DB_PATH = "../library-sp18/data/berkeley-2018.osm.xml";
+    //private static final String OSM_DB_PATH = "../library-sp18/data/berkeley-2018-small.osm.xml";
 
     public static void main(String[] args) {
         GraphDB g = new GraphDB(OSM_DB_PATH);
@@ -29,6 +30,16 @@ public class GraphDBLauncher {
             }
         }
 
+        int i = 0;
+        for (long id : g.vertices()) {
+            String name = g.getNodeName(id);
+            if (name == null) {
+                //System.out.println("Node " + i + " is null ");
+                continue;
+            }
+            i += 1;
+            System.out.println("Node " + i + " : " + name);
+        }
         long v = g.closest(-122.258207, 37.875352);
         System.out.print("The vertex number closest to -122.258207, 37.875352 is " + v + ", which");
         System.out.println(" has longitude, latitude of: " + g.lon(v) + ", " + g.lat(v));

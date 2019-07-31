@@ -166,6 +166,9 @@ public class TriSet {
             return null;
         }
         Node sNode = new Node();
+        if (root == null) {
+            return null;
+        }
         if (!root.next.isEmpty()) {
             sNode = root.next.get(s.charAt(0));
         }

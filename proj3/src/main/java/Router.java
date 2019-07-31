@@ -174,8 +174,7 @@ public class Router {
             while (i < routeSize && !prevWayNames.isEmpty()) {
                 wayLength += g.distance(node[i - 1], node[i]);
 
-                if (assignWayName && !prevWayNames.isEmpty()
-                        && prevWayNames.size() == 1) {
+                if (assignWayName && prevWayNames.size() == 1) {
                     wayName = prevWayNames.iterator().next();
                     assignWayName = false;
                 }
@@ -185,7 +184,7 @@ public class Router {
                 }
             }
             if (wayLength == 0) {
-                wayLength = g.distance(wayStart, wayStart + 1);
+                wayLength = g.distance(node[wayStart], node[wayStart + 1]);
             }
             NavigationDirection nd = new NavigationDirection();
             nd.way = wayName;
@@ -202,10 +201,15 @@ public class Router {
                 dir = getDirection(angle);
             }
             if (i == routeSize - 1) {
-                nd.way = g.getWayName(i).iterator().next();
-                nd.distance = g.distance(i - 1, i);;
-                nd.direction = dir;
-                ndList.add(nd);
+                NavigationDirection ndLast = new NavigationDirection();
+
+                Set<String> wayNames = g.getWayName(node[i]);
+                if (!wayNames.isEmpty()) {
+                    ndLast.way = wayNames.iterator().next();
+                }
+                ndLast.distance = g.distance(node[i - 1], node[i]);;
+                ndLast.direction = dir;
+                ndList.add(ndLast);
             }
         }
 

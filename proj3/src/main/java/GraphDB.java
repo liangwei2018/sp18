@@ -53,17 +53,11 @@ public class GraphDB {
             this.lat = lat;
             this.lon = lon;
             this.adj = new HashSet<>();
-            this.name = null;
-            //wayId = new HashSet<>();
-            //wayMaxSpeed = new HashSet<>();
             wayName = new HashSet<>();
 
         }
-        String getNodeName() {
-            return name;
-        }
-        String getCleanNodeName() {
-            return GraphDB.cleanString(name);
+        void setName(String name) {
+            this.name = name;
         }
     }
 
@@ -82,6 +76,26 @@ public class GraphDB {
      */
     void replaceNode(Node v) {
         nodes.replace(v.id, v);
+        //System.out.println("original name:" + getNode(id).name);
+        //System.out.println("V name:" + v.name);
+       // System.out.println("old size:" + nodes.size());
+        //removeNode(id);
+        //addNode(id, v);
+        //Node t = nodes.put(id, v);
+        //if (t != null) {
+        //    System.out.println("old name:" + t.name + "New name:" + getNode(id).name);
+        //}
+       // System.out.println("new size:" + nodes.size());
+    }
+
+    /**
+     *
+     * @param id the id key
+     * @return the node name that the specified id is associated with.
+     */
+
+    String getNodeName(long id) {
+        return nodes.get(id).name;
     }
 
     /**
@@ -125,7 +139,7 @@ public class GraphDB {
      * Add a way where a node is located to the node.
      */
 
-    void addWayToNode(long nodeId, long wayId, String name, int speed) {
+    void addWayToNode(long nodeId, String name) {
         Node v = getNode(nodeId);
         //v.wayId.add(wayId);
         v.wayName.add(name);
@@ -158,9 +172,6 @@ public class GraphDB {
         }
         long getId() {
             return id;
-        }
-        String getName() {
-            return name;
         }
         void clear() {
             nodeList.clear();
@@ -208,11 +219,17 @@ public class GraphDB {
 
         TriSet triNames = new TriSet();
         Random rand = new Random();
-        for (GraphDB.Node location : getAllNodes()) {
-            String name = location.getNodeName();
+        //Iterable<Node> nodeSet = getAllNodes();
+
+        int i = 0;
+        for (long id : vertices()) {
+            String name = nodes.get(id).name;
             if (name == null) {
+                //System.out.println("Node " + i + " is null ");
                 continue;
             }
+            i += 1;
+            System.out.println("Node " + i + " : " + name);
             String cleanName = GraphDB.cleanString(name);
             if (cleanName.startsWith(prefix)) {
                 triNames.put(cleanName, rand.nextInt(50) + 1);
@@ -220,6 +237,9 @@ public class GraphDB {
             }
         }
         List<String> pList = triNames.keysWithPrefix(prefix);
+        if (pList == null || pList.isEmpty()) {
+            return null;
+        }
         for (String topName : pList) {
             for (String matchName : totalMatchNames) {
                 String cleanName = GraphDB.cleanString(matchName);
@@ -251,7 +271,7 @@ public class GraphDB {
         }
         List<Map<String, Object>> nodeMapList = new LinkedList<>();
         for (GraphDB.Node node : getAllNodes()) {
-            String name = node.getNodeName();
+            String name = node.name;
             if (name == null) {
                 continue;
             }

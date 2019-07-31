@@ -73,9 +73,7 @@ public class GraphBuildingHandler extends DefaultHandler {
         if (qName.equals("node")) {
             /* We encountered a new <node...> tag. */
             activeState = "node";
-//            System.out.println("Node id: " + attributes.getValue("id"));
-//            System.out.println("Node lon: " + attributes.getValue("lon"));
-//            System.out.println("Node lat: " + attributes.getValue("lat"));
+
 
             /* TO DO Use the above information to save a "node" to somewhere. */
             /* Hint: A graph-like structure would be nice. */
@@ -85,9 +83,13 @@ public class GraphBuildingHandler extends DefaultHandler {
             GraphDB.Node c = new GraphDB.Node(id, lat, lon);
             g.addNode(c);
             lastNode = c;
+ //           System.out.println("Node id: " + attributes.getValue("id"));
+//            System.out.println("Node lon: " + attributes.getValue("lon"));
+//            System.out.println("Node lat: " + attributes.getValue("lat"));
         } else if (qName.equals("way")) {
             /* We encountered a new <way...> tag. */
             activeState = "way";
+            lastNode = null;
 //            System.out.println("Beginning a way...");
             long id = Long.parseLong(attributes.getValue("id"));
             osmWay = new GraphDB.Way(id);
@@ -103,7 +105,7 @@ public class GraphBuildingHandler extends DefaultHandler {
             remember whether this way is valid or not. */
             long id = Long.parseLong(attributes.getValue("ref"));
             osmWay.nodeList.add(id);
-
+            //System.out.println("Way Node's name: " + g.getNode(id).name);
 
         } else if (activeState.equals("way") && qName.equals("tag")) {
             /* While looking at a way, we found a <tag...> tag. */
@@ -132,9 +134,18 @@ public class GraphBuildingHandler extends DefaultHandler {
             /* Hint: Since we found this <tag...> INSIDE a node, we should probably remember which
             node this tag belongs to. Remember XML is parsed top-to-bottom, so probably it's the
             last node that you looked at (check the first if-case). */
-//            System.out.println("Node's name: " + attributes.getValue("v"));
-            lastNode.name = attributes.getValue("v");
+
+            String lastNodeName = attributes.getValue("v");
+            //System.out.println("Node's name: " + attributes.getValue("v"));
+            //System.out.println("Node's name: " + lastNode.name);
+            //System.out.println("Last Node id: " + lastNode.id);
+            //g.replaceNode(lastNode.id, lastNode);
+            lastNode.setName(lastNodeName);
+            //System.out.println("New Node's name: " + lastNode.name);
             g.replaceNode(lastNode);
+            //g.addNode(lastNode.id, lastNode);
+            //g.getNode(lastNode.id).setName(lastNodeName);
+
         }
     }
 
@@ -157,15 +168,20 @@ public class GraphBuildingHandler extends DefaultHandler {
             chance to actually connect the nodes together if the way is valid. */
 //            System.out.println("Finishing a way...");
             if (osmWay.validHighway) {
-                long wayId = osmWay.id;
+                //long wayId = osmWay.id;
                 String wayName = osmWay.name;
-                int maxSpeed = osmWay.maxSpeed;
+                System.out.println("Way name: " + wayName);
+                //int maxSpeed = osmWay.maxSpeed;
                 for (int i = 0; i < osmWay.nodeList.size() - 1; i += 1) {
                     long a = osmWay.nodeList.get(i);
                     long b = osmWay.nodeList.get(i + 1);
                     g.addEdge(a, b);
-                    g.addWayToNode(a, wayId, wayName, maxSpeed);
-                    g.addWayToNode(b, wayId, wayName, maxSpeed);
+                    g.addWayToNode(a, wayName);
+                    g.addWayToNode(b, wayName);
+                    //g.addWayToNode(b, wayId, wayName, maxSpeed);
+                    //System.out.println("Way Node's name: " + g.getNode(a).name);
+                    //System.out.println("Way Node's name: " + lastNode.name);
+
                 }
             }
             osmWay.clear();
