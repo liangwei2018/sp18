@@ -14,6 +14,8 @@ public class TriSet {
 
     //private static int R = 26;
     private Node root;
+    private static final int LENGTH = 5; // the first LENGTH of the string key used for comparison
+                                        // spaces will be counted for shorter strings.
 
     public static class Node implements Comparable<Node> {
         private char ch;
@@ -30,7 +32,7 @@ public class TriSet {
 
         @Override
         public int compareTo(Node that) {
-            return Integer.compare(-1 * this.best, -1 * that.best);
+            return Integer.compare(this.best, that.best);
         }
     }
 
@@ -69,13 +71,25 @@ public class TriSet {
     }
 
     /**
-     * Associates the specified values with the specified key in this Trie.
+     * Add the specified key to the Trie. compute its value (val) and best,
+     * based on ASCII of the first LENGTH letters in the key string.
      * @param key the specified key
-     * @param val the specified values
      *
      */
-    public void put(String key, int val) {
-        root = putHelp(root, key, val, 0, null);
+    public void put(String key) {
+        int val = 0;
+        int size = key.length();
+        for (int i = 0; i < Math.min(size, LENGTH); i += 1) {
+            int space = 32;
+            int m = key.charAt(i) - space;
+            val = val * 31 + m;
+        }
+        if (size < LENGTH) {
+            for (int i = size; i < LENGTH; i += 1) {
+                val = val * 31;
+            }
+        }
+        root = putHelp(root, key,  val, 0, null);
     }
 
     private Node putHelp(Node sNode, String key, int val, int l, Node prev) {
@@ -90,12 +104,10 @@ public class TriSet {
 
         if (l > 0 && l < key.length()) {
             sNode.ch = key.charAt(l - 1);
-            //sNode.best += 1;
         }
 
         if (l == key.length()) {
             sNode.ch = key.charAt(l - 1);
-            //sNode.best += 1;
             sNode.value = val;
             sNode.best = val;
             sNode.isKey = true;
@@ -135,7 +147,7 @@ public class TriSet {
      * @return A list of strings starting with s
      */
     List<String> keysWithPrefix(String s) {
-        if (s == null || s.isEmpty() || root == null) {
+        if (s == null || root == null) {
             return null;
         }
 
@@ -153,7 +165,7 @@ public class TriSet {
 
             if (topNode.isKey() && topNode.value == topNode.best) {
                 topNodeQueue.add(topNode);
-                if (topNodeQueue.size() > 10) {
+                if (topNodeQueue.size() > 50) {
                     break;
                 }
             }

@@ -75,7 +75,6 @@ public class GraphDB {
         double lat;
         double lon;
         String name;
-        //String cleanName;
 
 
         Place(long id, double lat, double lon, String name) {
@@ -83,12 +82,6 @@ public class GraphDB {
             this.lat = lat;
             this.lon = lon;
             this.name = name;
-            /*
-            if (name == null) {
-                this.cleanName = null;
-            } else {
-                this.cleanName = cleanString(name);
-            }*/
         }
     }
     /**
@@ -108,27 +101,18 @@ public class GraphDB {
 
         Place newPlace = new Place(id, lat, lon, name);
         namedPlaces.put(id, newPlace);
-        /*
-        if (!cleanNames.containsKey(cleanName)) {
-            cleanNames.put(cleanName, new LinkedList<>());
-        }
-        List<Place> addList = cleanNames.get(cleanName);
-        addList.add(newPlace);
-        cleanNames.put(cleanName, addList);
-        */
+
         cleanNames.computeIfAbsent(cleanName, k -> new LinkedList<>()).add(newPlace);
 
-        addToTrie(cleanName, 10);
-        //cleanNames.put(cleanName, );
+        addToTrie(cleanName);
     }
 
     /**
      * Add a place name to the Trie.
      * @param s the name of the place
-     * @param v its value in the trie.
      */
-    void addToTrie(String s, int v) {
-        triPlaceNames.put(s, v);
+    void addToTrie(String s) {
+        triPlaceNames.put(s);
     }
 
 
@@ -295,25 +279,17 @@ public class GraphDB {
      */
     public List<String> getLocationsByPrefix(String prefix) {
 
-        if (prefix == null || prefix.isEmpty()) {
+        if (prefix == null) {
             return null;
         }
         List<String> returnList = new LinkedList<>();
-        //List<String> totalMatchNames = new LinkedList<>();
-
-        //TriSet triNames = new TriSet();
-        //Random rand = new Random();
-        //Iterable<Node> nodeSet = getAllNodes();
 
 
         List<String> pList = triPlaceNames.keysWithPrefix(prefix);
-        if (pList == null || pList.isEmpty()) {
+        if (pList == null ) {
             return null;
         }
         for (String topName : pList) {
-            //List<Place> cleanNamesList = cleanNames.get(topName);
-            //if (cleanNamesList != null && !cleanNamesList.isEmpty()) {
-            //if (cleanNames.)
             Iterable<Place> list = getPlaceList(topName);
             if (list == null) {
                 continue;
