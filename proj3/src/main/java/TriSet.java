@@ -1,3 +1,4 @@
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,43 +20,13 @@ public class TriSet {
         private int value;
         private int best;
         private boolean isKey;
-        //private Node parent;
+        private Node parent;
         private Map<Character, Node> next = new HashMap<>();
-        /*
-        Node() {
-            c = '/';
-            value = null;
-            best = null;
-            isKey = false;
-        }
 
-        Node(char c, int value, boolean isKey, Node prev) {
-            this.c = c;
-            this.value = value;
-            this.best = value;
-            this.isKey = isKey;
-            this.parent = prev;
-        }*/
 
         boolean isKey() {
             return isKey;
         }
-        /*
-        V getValue() {
-            return value;
-        }
-
-        V getBest() {
-            return best;
-        }
-
-        Map<Character, Node> getNext() {
-            return next;
-        }
-
-        Set<Character> getNextKeySet() {
-            return next.keySet();
-        }*/
 
         @Override
         public int compareTo(Node that) {
@@ -104,12 +75,13 @@ public class TriSet {
      *
      */
     public void put(String key, int val) {
-        root = putHelp(root, key, val, 0);
+        root = putHelp(root, key, val, 0, null);
     }
 
-    private Node putHelp(Node sNode, String key, int val, int l) {
+    private Node putHelp(Node sNode, String key, int val, int l, Node prev) {
         if (sNode == null) {
             sNode = new Node();
+            sNode.parent = prev;
         }
 
         if (sNode.best < val) {
@@ -118,19 +90,20 @@ public class TriSet {
 
         if (l > 0 && l < key.length()) {
             sNode.ch = key.charAt(l - 1);
+            //sNode.best += 1;
         }
 
         if (l == key.length()) {
             sNode.ch = key.charAt(l - 1);
+            //sNode.best += 1;
             sNode.value = val;
+            sNode.best = val;
             sNode.isKey = true;
             return sNode;
         }
         char c = key.charAt(l);
 
-
-        //sNode.next.put(c, putHelp(sNode.next.get(c), key, val, l + 1, sNode));
-        sNode.next.put(c, putHelp(sNode.next.get(c), key, val, l + 1));
+        sNode.next.put(c, putHelp(sNode.next.get(c), key, val, l + 1, sNode));
         return sNode;
 
     }
@@ -162,59 +135,40 @@ public class TriSet {
      * @return A list of strings starting with s
      */
     List<String> keysWithPrefix(String s) {
-        if (s == null || s.isEmpty()) {
+        if (s == null || s.isEmpty() || root == null) {
             return null;
         }
-        Node sNode = new Node();
-        if (root == null) {
-            return null;
-        }
-        if (!root.next.isEmpty()) {
-            sNode = root.next.get(s.charAt(0));
-        }
-        for (int i = 1; i < s.length(); i += 1) {
-            if (sNode == null) {
-                return null;
-            }
-            sNode = sNode.next.get(s.charAt(i));
-            System.out.println("sNode.ch:" + sNode.ch);
-        }
 
+        Node sNode = getHelp(root, s, 0);
 
-                /*root.next.get(s.charAt(0));
-        for (int i = 1; i < s.length(); i += 1) {
-            sNode = sNode.next.get(s.charAt(i));
-        }*/
 
         List<String> keysList = new ArrayList<>();
-        StringBuilder t = new StringBuilder(s);
         Queue<Node> pq = new PriorityQueue<>();
-        //StringBuilder temp = t;
+        Queue<Node> topNodeQueue = new ArrayDeque<>();
         if (!sNode.next.isEmpty()) {
             pq.addAll(sNode.next.values());
         }
-        int num = 0;
         while (!pq.isEmpty()) {
             Node topNode = pq.poll();
-            t.append(topNode.ch);
 
-            if (topNode.isKey()) {
-                /*while (topNode.parent.parent != null) {
-
-                    topNode = topNode.parent;
-                }*/
-                keysList.add(t.toString());
-
-                if (topNode.next.isEmpty()) {
-                    t = new StringBuilder(s);
-                }
-
-                num += 1;
-                if (num > 3) {
+            if (topNode.isKey() && topNode.value == topNode.best) {
+                topNodeQueue.add(topNode);
+                if (topNodeQueue.size() > 10) {
                     break;
                 }
             }
             pq.addAll(topNode.next.values());
+        }
+
+
+        while (!topNodeQueue.isEmpty()) {
+            StringBuilder temp = new StringBuilder();
+            Node topNode = topNodeQueue.poll();
+            while (topNode.parent != null) {
+                temp.append(topNode.ch);
+                topNode = topNode.parent;
+            }
+            keysList.add(temp.reverse().toString());
         }
 
         return keysList;

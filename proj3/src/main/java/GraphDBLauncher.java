@@ -7,8 +7,8 @@ import java.util.ArrayList;
  * GraphDB in isolation from all the rest of the parts of this assignment.
  */
 public class GraphDBLauncher {
-    private static final String OSM_DB_PATH = "../library-sp18/data/berkeley-2018.osm.xml";
-    //private static final String OSM_DB_PATH = "../library-sp18/data/berkeley-2018-small.osm.xml";
+    //private static final String OSM_DB_PATH = "../library-sp18/data/berkeley-2018.osm.xml";
+    private static final String OSM_DB_PATH = "../library-sp18/data/berkeley-2019.osm.xml";
 
     public static void main(String[] args) {
         GraphDB g = new GraphDB(OSM_DB_PATH);
@@ -23,6 +23,8 @@ public class GraphDBLauncher {
 
         System.out.println("There are " + vertices.size() + " vertices in the graph.");
 
+        System.out.println("There are " + g.numPlaces() + " named places");
+
         System.out.println("The first 10 vertices are:");
         for (int i = 0; i < 10; i += 1) {
             if (i < vertices.size()) {
@@ -31,15 +33,37 @@ public class GraphDBLauncher {
         }
 
         int i = 0;
-        for (long id : g.vertices()) {
-            String name = g.getNodeName(id);
+        for (GraphDB.Place p : g.getAllPlaces()) {
+            String name = p.name;
             if (name == null) {
                 //System.out.println("Node " + i + " is null ");
                 continue;
             }
             i += 1;
-            System.out.println("Node " + i + " : " + name);
+            //System.out.println(i + "th place " + p.id + " : " + name);
         }
+
+        /*
+        for (String cleanName : g.getAllCleanNames()) {
+            Iterable<GraphDB.Place> list = g.getPlaceList(cleanName);
+            for (GraphDB.Place p : list) {
+               //System.out.println(i + "th place " + p.name + " : " + cleanName);
+            }
+        }*/
+
+        if (false) {
+            i = 0;
+            for (String cleanName : g.getAllTrieKeys()) {
+                i += 1;
+                //System.out.println(i + "th key " + cleanName);
+            }
+        }
+
+        for (String cleanName : g.getLocationsByPrefix("the")) {
+            System.out.println(i + "th prefix the: " + cleanName);
+        }
+
+
         long v = g.closest(-122.258207, 37.875352);
         System.out.print("The vertex number closest to -122.258207, 37.875352 is " + v + ", which");
         System.out.println(" has longitude, latitude of: " + g.lon(v) + ", " + g.lat(v));

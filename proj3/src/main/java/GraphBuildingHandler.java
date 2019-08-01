@@ -4,6 +4,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -40,6 +41,7 @@ public class GraphBuildingHandler extends DefaultHandler {
     private final GraphDB g;
     private GraphDB.Node lastNode;
     private GraphDB.Way osmWay;
+    Random rand = new Random();
 
     /**
      * Create a new GraphBuildingHandler.
@@ -105,7 +107,6 @@ public class GraphBuildingHandler extends DefaultHandler {
             remember whether this way is valid or not. */
             long id = Long.parseLong(attributes.getValue("ref"));
             osmWay.nodeList.add(id);
-            //System.out.println("Way Node's name: " + g.getNode(id).name);
 
         } else if (activeState.equals("way") && qName.equals("tag")) {
             /* While looking at a way, we found a <tag...> tag. */
@@ -123,7 +124,6 @@ public class GraphBuildingHandler extends DefaultHandler {
                     osmWay.validHighway = true;
                 }
             } else if (k.equals("name")) {
-                //System.out.println("Way Name: " + v);
                 osmWay.name = v;
             }
 //            System.out.println("Tag with k=" + k + ", v=" + v + ".");
@@ -137,15 +137,13 @@ public class GraphBuildingHandler extends DefaultHandler {
 
             String lastNodeName = attributes.getValue("v");
             //System.out.println("Node's name: " + attributes.getValue("v"));
-            //System.out.println("Node's name: " + lastNode.name);
-            //System.out.println("Last Node id: " + lastNode.id);
-            //g.replaceNode(lastNode.id, lastNode);
             lastNode.setName(lastNodeName);
-            //System.out.println("New Node's name: " + lastNode.name);
             g.replaceNode(lastNode);
-            //g.addNode(lastNode.id, lastNode);
-            //g.getNode(lastNode.id).setName(lastNodeName);
 
+            String cleanName = GraphDB.cleanString(lastNodeName);
+            if (!cleanName.isEmpty()) {
+                g.addPlace(lastNode.id, lastNode.lat, lastNode.lon, lastNodeName);
+            }
         }
     }
 
@@ -170,7 +168,7 @@ public class GraphBuildingHandler extends DefaultHandler {
             if (osmWay.validHighway) {
                 //long wayId = osmWay.id;
                 String wayName = osmWay.name;
-                System.out.println("Way name: " + wayName);
+                //System.out.println("Way name: " + wayName);
                 //int maxSpeed = osmWay.maxSpeed;
                 for (int i = 0; i < osmWay.nodeList.size() - 1; i += 1) {
                     long a = osmWay.nodeList.get(i);

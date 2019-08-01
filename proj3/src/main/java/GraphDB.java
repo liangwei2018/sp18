@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.Map;
 
@@ -30,12 +29,19 @@ public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
     private final Map<Long, Node> nodes = new HashMap<>();
+    private final Map<Long, Place> namedPlaces = new HashMap<>();
+    private final TriSet triPlaceNames = new TriSet();
+    private final Map<String, List<Place>> cleanNames = new HashMap<>();
+
+
     //private final Map<Long, Long> nodeToWay = new HashMap<>();
     //private final Map<Long, Way> ways = new HashMap<>();
 
     /**
      * A Node/Vertex, a single point in space defined by
      * node id, longitude, and latitude.
+     * Note: Only connected nodes are kept in a graph.
+     *
      */
     static class Node {
         long id;
@@ -43,9 +49,7 @@ public class GraphDB {
         double lon;
         String name;
         Set<GraphDB.Node> adj;
-        //Set<Long> wayId;
         Set<String> wayName;
-        //Set<Integer> wayMaxSpeed;
 
 
         Node(long id, double lat, double lon) {
@@ -62,11 +66,116 @@ public class GraphDB {
     }
 
     /**
+     * A place class, a place in space defined by
+     * node id, longitude, latitude, and name.
+     * Note: not all namedPlaces are connected.
+     */
+    static class Place {
+        long id;
+        double lat;
+        double lon;
+        String name;
+        //String cleanName;
+
+
+        Place(long id, double lat, double lon, String name) {
+            this.id = id;
+            this.lat = lat;
+            this.lon = lon;
+            this.name = name;
+            /*
+            if (name == null) {
+                this.cleanName = null;
+            } else {
+                this.cleanName = cleanString(name);
+            }*/
+        }
+    }
+    /**
      * Add a node to the graph
      * @param v the node
      */
     void addNode(Node v) {
         nodes.put(v.id, v);
+    }
+
+    /**
+     * Add a Place to the graph and create a map with cleanNames
+     * @param id the place id
+     */
+    void addPlace(long id, double lat, double lon, String name) {
+        String cleanName = cleanString(name);
+
+        Place newPlace = new Place(id, lat, lon, name);
+        namedPlaces.put(id, newPlace);
+        /*
+        if (!cleanNames.containsKey(cleanName)) {
+            cleanNames.put(cleanName, new LinkedList<>());
+        }
+        List<Place> addList = cleanNames.get(cleanName);
+        addList.add(newPlace);
+        cleanNames.put(cleanName, addList);
+        */
+        cleanNames.computeIfAbsent(cleanName, k -> new LinkedList<>()).add(newPlace);
+
+        addToTrie(cleanName, 10);
+        //cleanNames.put(cleanName, );
+    }
+
+    /**
+     * Add a place name to the Trie.
+     * @param s the name of the place
+     * @param v its value in the trie.
+     */
+    void addToTrie(String s, int v) {
+        triPlaceNames.put(s, v);
+    }
+
+
+    /**
+     * Get all Trie keys
+     *
+     */
+    List<String> getAllTrieKeys() {
+        return triPlaceNames.getKeys();
+    }
+    /**
+     * Get information about a Place
+     * @param id the place id
+     */
+    Place getPlace(long id) {
+        return namedPlaces.get(id);
+    }
+
+    /**
+     *
+     * @return all namedPlaces in the graph
+     */
+    Iterable<Place> getAllPlaces() {
+        return namedPlaces.values();
+    }
+
+    /**
+     *
+     * @return the list of places with the same cleanName.
+     */
+    Iterable<Place> getPlaceList(String cleanName) {
+        return cleanNames.get(cleanName);
+    }
+
+    /**
+     *
+     * @return the list of places with the same cleanName.
+     */
+    Iterable<String> getAllCleanNames() {
+        return cleanNames.keySet();
+    }
+    /**
+     *
+     * @return the number of namedPlaces
+     */
+    int numPlaces() {
+        return namedPlaces.size();
     }
 
     /**
@@ -76,27 +185,8 @@ public class GraphDB {
      */
     void replaceNode(Node v) {
         nodes.replace(v.id, v);
-        //System.out.println("original name:" + getNode(id).name);
-        //System.out.println("V name:" + v.name);
-       // System.out.println("old size:" + nodes.size());
-        //removeNode(id);
-        //addNode(id, v);
-        //Node t = nodes.put(id, v);
-        //if (t != null) {
-        //    System.out.println("old name:" + t.name + "New name:" + getNode(id).name);
-        //}
-       // System.out.println("new size:" + nodes.size());
     }
 
-    /**
-     *
-     * @param id the id key
-     * @return the node name that the specified id is associated with.
-     */
-
-    String getNodeName(long id) {
-        return nodes.get(id).name;
-    }
 
     /**
      *
@@ -104,24 +194,18 @@ public class GraphDB {
      * @return the node that the specified id is associated with.
      */
 
-    Node getNode(long id) {
+    private Node getNode(long id) {
         return nodes.get(id);
     }
 
-    /**
-     *
-     * @return all nodes in the graph
-     */
-    Iterable<Node> getAllNodes() {
-        return nodes.values();
-    }
+
 
     /**
      * Remove a specified Node
      * @param id the id key
      * @return the specified Node associated with the id.
      */
-    Node removeNode(long id) {
+    private Node removeNode(long id) {
         return nodes.remove(id);
     }
     /**
@@ -215,41 +299,29 @@ public class GraphDB {
             return null;
         }
         List<String> returnList = new LinkedList<>();
-        List<String> totalMatchNames = new LinkedList<>();
+        //List<String> totalMatchNames = new LinkedList<>();
 
-        TriSet triNames = new TriSet();
-        Random rand = new Random();
+        //TriSet triNames = new TriSet();
+        //Random rand = new Random();
         //Iterable<Node> nodeSet = getAllNodes();
 
-        int i = 0;
-        for (long id : vertices()) {
-            String name = nodes.get(id).name;
-            if (name == null) {
-                //System.out.println("Node " + i + " is null ");
-                continue;
-            }
-            i += 1;
-            System.out.println("Node " + i + " : " + name);
-            String cleanName = GraphDB.cleanString(name);
-            if (cleanName.startsWith(prefix)) {
-                triNames.put(cleanName, rand.nextInt(50) + 1);
-                totalMatchNames.add(name);
-            }
-        }
-        List<String> pList = triNames.keysWithPrefix(prefix);
+
+        List<String> pList = triPlaceNames.keysWithPrefix(prefix);
         if (pList == null || pList.isEmpty()) {
             return null;
         }
         for (String topName : pList) {
-            for (String matchName : totalMatchNames) {
-                String cleanName = GraphDB.cleanString(matchName);
-                if (topName.equals(cleanName)) {
-                    returnList.add(matchName);
-                    break;
-                }
+            //List<Place> cleanNamesList = cleanNames.get(topName);
+            //if (cleanNamesList != null && !cleanNamesList.isEmpty()) {
+            //if (cleanNames.)
+            Iterable<Place> list = getPlaceList(topName);
+            if (list == null) {
+                continue;
+            }
+            for (Place p : list) {
+                returnList.add(p.name);
             }
         }
-
         return returnList;
     }
 
@@ -269,24 +341,19 @@ public class GraphDB {
         if (locationName == null || locationName.isEmpty()) {
             return null;
         }
-        List<Map<String, Object>> nodeMapList = new LinkedList<>();
-        for (GraphDB.Node node : getAllNodes()) {
-            String name = node.name;
-            if (name == null) {
-                continue;
-            }
-            String cleanName = GraphDB.cleanString(name);
-            String cleanLocationName = GraphDB.cleanString(locationName);
-            if (cleanName.equals(cleanLocationName)) {
-                Map<String, Object> nodeMap = new HashMap<>();
-                nodeMap.put("lat", node.lat);
-                nodeMap.put("lon", node.lon);
-                nodeMap.put("name", node.name);
-                nodeMap.put("id", node.id);
-                nodeMapList.add(nodeMap);
-            }
+        List<Map<String, Object>> placeMapList = new LinkedList<>();
+
+        String cleanLocationName = GraphDB.cleanString(locationName);
+
+        for (Place p : cleanNames.get(cleanLocationName)) {
+            Map<String, Object> nodeMap = new HashMap<>();
+            nodeMap.put("lat", p.lat);
+            nodeMap.put("lon", p.lon);
+            nodeMap.put("name", p.name);
+            nodeMap.put("id", p.id);
+            placeMapList.add(nodeMap);
         }
-        return nodeMapList;
+        return placeMapList;
     }
 
     /**
