@@ -60,7 +60,7 @@ public class GraphDBLauncher {
             }
         }
 
-        for (String cleanName : g.getLocationsByPrefix("")) {
+        for (String cleanName : g.getLocationsByPrefix("J")) {
             System.out.println("prefix a: " + cleanName);
         }
         for (Map<String, Object> p : g.getLocations("")) {

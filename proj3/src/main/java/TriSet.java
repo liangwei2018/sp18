@@ -14,8 +14,10 @@ public class TriSet {
 
     //private static int R = 26;
     private Node root;
-    private static final int LENGTH = 12; // the first LENGTH of the string key used for comparison
-                                        // spaces will be counted for shorter strings.
+    private static final int LENGTH = 12; // the first LENGTH of the string used for comparison.
+            // spaces will be appended to shorter strings for calculation.
+
+    private static final int NUM = 30; // max NUM of keys returned by keysWithPrefix().
 
     public static class Node implements Comparable<Node> {
         private char ch;
@@ -89,7 +91,8 @@ public class TriSet {
         }
         if (size < LENGTH) {
             for (int i = size; i < LENGTH; i += 1) {
-                val = val * 27;
+                int m = ' ' - 'a';
+                val = val * 27 + m;
             }
         }
         root = putHelp(root, key,  val, 0, null);
@@ -163,16 +166,14 @@ public class TriSet {
         Queue<Node> pq = new PriorityQueue<>();
         Queue<Node> topNodeQueue = new ArrayDeque<>();
         pq.add(sNode);
-        /*
-        if (sNode.next != null) {
-            pq.addAll(sNode.next.values());
-        }*/
+
         while (!pq.isEmpty()) {
             Node topNode = pq.poll();
             //System.out.println("pq poll node character:" + topNode.ch);
-            if (topNode.isKey() && topNode.value == topNode.best) {
+            // && topNode.value == topNode.best
+            if (topNode.isKey()) {
                 topNodeQueue.add(topNode);
-                if (topNodeQueue.size() > 10) {
+                if (topNodeQueue.size() > NUM - 1) {
                     break;
                 }
             }
