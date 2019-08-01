@@ -17,7 +17,7 @@ public class TriSet {
     private static final int LENGTH = 12; // the first LENGTH of the string used for comparison.
             // spaces will be appended to shorter strings for calculation.
 
-    private static final int NUM = 30; // max NUM of keys returned by keysWithPrefix().
+    private static final int NUM = Integer.MAX_VALUE; // max NUM of keys returned by keysWithPrefix().
 
     public static class Node implements Comparable<Node> {
         private char ch;
