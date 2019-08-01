@@ -14,13 +14,13 @@ public class TriSet {
 
     //private static int R = 26;
     private Node root;
-    private static final int LENGTH = 5; // the first LENGTH of the string key used for comparison
+    private static final int LENGTH = 12; // the first LENGTH of the string key used for comparison
                                         // spaces will be counted for shorter strings.
 
     public static class Node implements Comparable<Node> {
         private char ch;
-        private int value;
-        private int best;
+        private long value;
+        private long best;
         private boolean isKey;
         private Node parent;
         private Map<Character, Node> next = new HashMap<>();
@@ -32,7 +32,7 @@ public class TriSet {
 
         @Override
         public int compareTo(Node that) {
-            return Integer.compare(this.best, that.best);
+            return Long.compare(this.best, that.best);
         }
     }
 
@@ -42,7 +42,7 @@ public class TriSet {
      * @param key the key string
      * @return the value corresponding to the key node.
      */
-    public int get(String key) {
+    public long get(String key) {
         Node node = getHelp(root, key, 0);
         if (node == null) {
             return 0;
@@ -80,22 +80,22 @@ public class TriSet {
         if (key == null || key.isEmpty()) {
             return;
         }
-        int val = 0;
+        long val = 0;
         int size = key.length();
         for (int i = 0; i < Math.min(size, LENGTH); i += 1) {
-            int space = 32;
-            int m = key.charAt(i) - space;
-            val = val * 31 + m;
+            int a = 'a';
+            int m = key.charAt(i) - a;
+            val = val * 27 + m;
         }
         if (size < LENGTH) {
             for (int i = size; i < LENGTH; i += 1) {
-                val = val * 31;
+                val = val * 27;
             }
         }
         root = putHelp(root, key,  val, 0, null);
     }
 
-    private Node putHelp(Node sNode, String key, int val, int l, Node prev) {
+    private Node putHelp(Node sNode, String key, long val, int l, Node prev) {
         if (sNode == null) {
             sNode = new Node();
             sNode.parent = prev;
