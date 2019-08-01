@@ -140,10 +140,10 @@ public class GraphBuildingHandler extends DefaultHandler {
             lastNode.setName(lastNodeName);
             g.replaceNode(lastNode);
 
-            String cleanName = GraphDB.cleanString(lastNodeName);
-            if (!cleanName.isEmpty()) {
-                g.addPlace(lastNode.id, lastNode.lat, lastNode.lon, lastNodeName);
-            }
+            //String cleanName = GraphDB.cleanString(lastNodeName);
+            //if (!cleanName.isEmpty()) {
+            g.addPlace(lastNode.id, lastNode.lat, lastNode.lon, lastNodeName);
+            //}
         }
     }
 

@@ -282,10 +282,11 @@ public class GraphDB {
         if (prefix == null) {
             return null;
         }
+        String cleanPrefix = cleanString(prefix);
         List<String> returnList = new LinkedList<>();
 
 
-        List<String> pList = triPlaceNames.keysWithPrefix(prefix);
+        List<String> pList = triPlaceNames.keysWithPrefix(cleanPrefix);
         if (pList == null ) {
             return null;
         }
@@ -295,7 +296,9 @@ public class GraphDB {
                 continue;
             }
             for (Place p : list) {
-                returnList.add(p.name);
+                if (!returnList.contains(p.name)) {
+                    returnList.add(p.name);
+                }
             }
         }
         return returnList;
@@ -319,7 +322,7 @@ public class GraphDB {
         }
         List<Map<String, Object>> placeMapList = new LinkedList<>();
 
-        String cleanLocationName = GraphDB.cleanString(locationName);
+        String cleanLocationName = cleanString(locationName);
 
         for (Place p : cleanNames.get(cleanLocationName)) {
             Map<String, Object> nodeMap = new HashMap<>();

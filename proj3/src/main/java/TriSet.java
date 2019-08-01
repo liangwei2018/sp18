@@ -77,6 +77,9 @@ public class TriSet {
      *
      */
     public void put(String key) {
+        if (key == null || key.isEmpty()) {
+            return;
+        }
         int val = 0;
         int size = key.length();
         for (int i = 0; i < Math.min(size, LENGTH); i += 1) {
@@ -106,7 +109,7 @@ public class TriSet {
             sNode.ch = key.charAt(l - 1);
         }
 
-        if (l == key.length()) {
+        if (l == key.length() && l > 0) {
             sNode.ch = key.charAt(l - 1);
             sNode.value = val;
             sNode.best = val;
@@ -152,20 +155,24 @@ public class TriSet {
         }
 
         Node sNode = getHelp(root, s, 0);
-
+        if (sNode == null) {
+            return null;
+        }
 
         List<String> keysList = new ArrayList<>();
         Queue<Node> pq = new PriorityQueue<>();
         Queue<Node> topNodeQueue = new ArrayDeque<>();
-        if (!sNode.next.isEmpty()) {
+        pq.add(sNode);
+        /*
+        if (sNode.next != null) {
             pq.addAll(sNode.next.values());
-        }
+        }*/
         while (!pq.isEmpty()) {
             Node topNode = pq.poll();
-
+            //System.out.println("pq poll node character:" + topNode.ch);
             if (topNode.isKey() && topNode.value == topNode.best) {
                 topNodeQueue.add(topNode);
-                if (topNodeQueue.size() > 50) {
+                if (topNodeQueue.size() > 20) {
                     break;
                 }
             }
