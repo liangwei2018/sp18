@@ -172,7 +172,7 @@ public class TriSet {
             //System.out.println("pq poll node character:" + topNode.ch);
             if (topNode.isKey() && topNode.value == topNode.best) {
                 topNodeQueue.add(topNode);
-                if (topNodeQueue.size() > 20) {
+                if (topNodeQueue.size() > 10) {
                     break;
                 }
             }

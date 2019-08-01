@@ -93,8 +93,12 @@ public class GraphDB {
     }
 
     /**
-     * Add a Place to the graph and create a map with cleanNames
+     * Add a Place to the graph, create a map with cleanNames
+     * and put cleanNames to a Trie.
      * @param id the place id
+     * @param lat the latitude of the place
+     * @param lon the longitude of the place
+     * @param name the full name of the place
      */
     void addPlace(long id, double lat, double lon, String name) {
         String cleanName = cleanString(name);
@@ -317,14 +321,17 @@ public class GraphDB {
      * "id" : Number, The id of the node. <br>
      */
     public List<Map<String, Object>> getLocations(String locationName) {
-        if (locationName == null || locationName.isEmpty()) {
+        if (locationName == null) {
             return null;
         }
         List<Map<String, Object>> placeMapList = new LinkedList<>();
 
         String cleanLocationName = cleanString(locationName);
-
-        for (Place p : cleanNames.get(cleanLocationName)) {
+        List<Place> cleanNamesList = cleanNames.get(cleanLocationName);
+        if (cleanNamesList.isEmpty()) {
+            return null;
+        }
+        for (Place p : cleanNamesList) {
             Map<String, Object> nodeMap = new HashMap<>();
             nodeMap.put("lat", p.lat);
             nodeMap.put("lon", p.lon);

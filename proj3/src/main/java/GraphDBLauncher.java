@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * This class provides a main method for experimenting with GraphDB construction.
@@ -59,10 +60,12 @@ public class GraphDBLauncher {
             }
         }
 
-        for (String cleanName : g.getLocationsByPrefix("a")) {
+        for (String cleanName : g.getLocationsByPrefix("")) {
             System.out.println("prefix a: " + cleanName);
         }
-
+        for (Map<String, Object> p : g.getLocations("")) {
+            System.out.println("location name:" + p.get("name"));
+        }
 
         long v = g.closest(-122.258207, 37.875352);
         System.out.print("The vertex number closest to -122.258207, 37.875352 is " + v + ", which");
