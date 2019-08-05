@@ -35,7 +35,14 @@ public class MergeSort {
     private static <Item extends Comparable> Queue<Queue<Item>>
             makeSingleItemQueues(Queue<Item> items) {
         // Your code here!
-        return null;
+        Queue<Queue<Item>> qq = new Queue<>();
+
+        for (Item item : items) {
+            Queue<Item> q = new Queue<>();
+            q.enqueue(item);
+            qq.enqueue(q);
+        }
+        return qq;
     }
 
     /**
@@ -54,13 +61,49 @@ public class MergeSort {
     private static <Item extends Comparable> Queue<Item> mergeSortedQueues(
             Queue<Item> q1, Queue<Item> q2) {
         // Your code here!
-        return null;
+        Queue<Item> q = new Queue<>();
+        while (!q1.isEmpty() || !q2.isEmpty()) {
+            q.enqueue(getMin(q1, q2));
+        }
+        return q;
     }
 
     /** Returns a Queue that contains the given items sorted from least to greatest. */
     public static <Item extends Comparable> Queue<Item> mergeSort(
             Queue<Item> items) {
         // Your code here!
-        return items;
+        int size = items.size();
+        if (items.isEmpty()) {
+            return null;
+        }
+        if (size == 1) {
+            return items;
+        }
+        Queue<Item> halfItems = new Queue<>();
+        for (int i = 0; i < size / 2; i += 1) {
+            halfItems.enqueue(items.dequeue());
+        }
+        Queue<Item> sq1 = mergeSort(halfItems);
+        Queue<Item> sq2 = mergeSort(items);
+        return mergeSortedQueues(sq1, sq2);
+    }
+
+
+    public static void main(String[] args) {
+        Queue<String> students = new Queue<String>();
+        students.enqueue("Alice");
+        students.enqueue("Vanessa");
+        students.enqueue("Ethan");
+
+        System.out.println("original order: \n");
+        for (String s : students) {
+            System.out.println(s);
+        }
+        System.out.println("new order: \n");
+        Queue<String> sortedStudents = MergeSort.mergeSort(students);
+        for (String s : sortedStudents) {
+            System.out.println(s);
+        }
+
     }
 }
