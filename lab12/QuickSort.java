@@ -67,7 +67,8 @@ public class QuickSort {
             Queue<Item> items) {
         // Your code here!
         if (items == null || items.isEmpty()) {
-            throw new IllegalArgumentException("null or empty items Queue!");
+            //throw new IllegalArgumentException("null or empty items Queue!");
+            return items;
         }
         if (items.size() == 1) {
             return items;

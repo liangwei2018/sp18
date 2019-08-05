@@ -74,7 +74,8 @@ public class MergeSort {
         // Your code here!
 
         if (items == null || items.isEmpty()) {
-            throw new IllegalArgumentException("null or empty items Queue!");
+            //throw new IllegalArgumentException("null or empty items Queue!");
+            return items;
         }
         int size = items.size();
         if (size == 1) {
