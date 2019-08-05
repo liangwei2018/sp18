@@ -72,10 +72,11 @@ public class MergeSort {
     public static <Item extends Comparable> Queue<Item> mergeSort(
             Queue<Item> items) {
         // Your code here!
-        int size = items.size();
-        if (items.isEmpty()) {
-            return null;
+
+        if (items == null || items.isEmpty()) {
+            throw new IllegalArgumentException("null or empty items Queue!");
         }
+        int size = items.size();
         if (size == 1) {
             return items;
         }
