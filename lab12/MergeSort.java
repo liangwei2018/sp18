@@ -72,22 +72,26 @@ public class MergeSort {
     public static <Item extends Comparable> Queue<Item> mergeSort(
             Queue<Item> items) {
         // Your code here!
-
         if (items == null || items.isEmpty()) {
-            //throw new IllegalArgumentException("null or empty items Queue!");
             return items;
         }
         int size = items.size();
         if (size == 1) {
             return items;
         }
-        Queue<Item> halfItems = new Queue<>();
-        for (int i = 0; i < size / 2; i += 1) {
-            halfItems.enqueue(items.dequeue());
+        Queue<Item> sq1 = new Queue<>();
+        Queue<Item> sq2 = new Queue<>();
+        int i = 0;
+        for (Item item : items) {
+            if (i < size / 2) {
+                sq1.enqueue(item);
+                i += 1;
+            } else {
+                sq2.enqueue(item);
+                i += 1;
+            }
         }
-        Queue<Item> sq1 = mergeSort(halfItems);
-        Queue<Item> sq2 = mergeSort(items);
-        return mergeSortedQueues(sq1, sq2);
+        return mergeSortedQueues(mergeSort(sq1), mergeSort(sq2));
     }
 
 
