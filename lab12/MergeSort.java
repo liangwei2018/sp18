@@ -94,6 +94,10 @@ public class MergeSort {
         students.enqueue("Alice");
         students.enqueue("Vanessa");
         students.enqueue("Ethan");
+        students.enqueue("Alex");
+        students.enqueue("Will");
+        students.enqueue("Liam");
+        students.enqueue("Ethan");
 
         System.out.println("original order: \n");
         for (String s : students) {
@@ -101,8 +105,12 @@ public class MergeSort {
         }
         System.out.println("new order: \n");
         Queue<String> sortedStudents = MergeSort.mergeSort(students);
-        for (String s : sortedStudents) {
-            System.out.println(s);
+        if (sortedStudents != null) {
+            for (String s : sortedStudents) {
+                System.out.println(s);
+            }
+        } else {
+            System.out.println("null sorted Queue!");
         }
 
     }
