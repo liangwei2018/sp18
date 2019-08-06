@@ -79,6 +79,14 @@ public class MergeSort {
         if (size == 1) {
             return items;
         }
+
+        Queue<Queue<Item>> q2 = makeSingleItemQueues(items);
+        while (q2.size() > 1) {
+            Queue<Item> q1 = mergeSortedQueues(q2.dequeue(), q2.dequeue());
+            q2.enqueue(q1);
+        }
+        return q2.dequeue();
+        /*
         if (size == 2) {
             Queue<Queue<Item>> q2 = makeSingleItemQueues(items);
             return mergeSortedQueues(q2.dequeue(), q2.dequeue());
@@ -95,6 +103,7 @@ public class MergeSort {
             i += 1;
         }
         return mergeSortedQueues(mergeSort(sq1), mergeSort(sq2));
+        */
     }
 
 
@@ -107,16 +116,34 @@ public class MergeSort {
         students.enqueue("Will");
         students.enqueue("Liam");
         students.enqueue("Ethan");
+        students.enqueue("Vane");
+        students.enqueue("Eth");
+        students.enqueue("Al");
+        students.enqueue("Wi");
+        students.enqueue("Lia");
+        students.enqueue("Etha");
+        students.enqueue("Vaness");
+        students.enqueue("Et");
+        students.enqueue("Ale");
+        students.enqueue("Wil");
+        students.enqueue("Li");
+        students.enqueue("Eth");
 
         System.out.println("original order: \n");
         for (String s : students) {
-            System.out.println(s);
+            System.out.print(" / " + s);
         }
         System.out.println("new order: \n");
-        Queue<String> sortedStudents = MergeSort.mergeSort(students);
+        Queue<String> sortedStudents = new Queue<>();
+        long start = System.nanoTime();
+        for (int i = 0; i < 1000000; i += 1) {
+            sortedStudents = MergeSort.mergeSort(students);
+        }
+        long end = System.nanoTime();
+        System.out.println("The time mergeSort takes: " + (end - start) / 1000000000.0 + " seconds");
         if (sortedStudents != null) {
             for (String s : sortedStudents) {
-                System.out.println(s);
+                System.out.print(" / " + s);
             }
         } else {
             System.out.println("null sorted Queue!");
