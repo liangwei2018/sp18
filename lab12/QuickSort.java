@@ -66,19 +66,17 @@ public class QuickSort {
     public static <Item extends Comparable> Queue<Item> quickSort(
             Queue<Item> items) {
         // Your code here!
-        if (items == null || items.isEmpty()) {
-            return items;
-        }
-        if (items.size() == 1) {
+        if (items == null || items.size() <= 1) {
             return items;
         }
         Queue<Item> less = new Queue<>();
         Queue<Item> equal = new Queue<>();
         Queue<Item> greater = new Queue<>();
-        Queue<Item> sortedQueue = new Queue<>();
+        //Queue<Item> sortedQueue = new Queue<>();
         Item randPivotItem = getRandomItem(items);
 
         partition(items, randPivotItem, less, equal, greater);
+        /*
         if (!less.isEmpty()) {
             sortedQueue = catenate(sortedQueue, quickSort(less));
         }
@@ -86,7 +84,8 @@ public class QuickSort {
         if (!greater.isEmpty()) {
             sortedQueue = catenate(sortedQueue, quickSort(greater));
         }
-        return sortedQueue;
+        return sortedQueue;*/
+        return catenate(catenate(quickSort(less), equal), quickSort(greater));
     }
 
     public static void main(String[] args) {

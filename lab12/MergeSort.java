@@ -79,17 +79,20 @@ public class MergeSort {
         if (size == 1) {
             return items;
         }
+        if (size == 2) {
+            Queue<Queue<Item>> q2 = makeSingleItemQueues(items);
+            return mergeSortedQueues(q2.dequeue(), q2.dequeue());
+        }
         Queue<Item> sq1 = new Queue<>();
         Queue<Item> sq2 = new Queue<>();
         int i = 0;
         for (Item item : items) {
             if (i < size / 2) {
                 sq1.enqueue(item);
-                i += 1;
             } else {
                 sq2.enqueue(item);
-                i += 1;
             }
+            i += 1;
         }
         return mergeSortedQueues(mergeSort(sq1), mergeSort(sq2));
     }
