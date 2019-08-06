@@ -133,14 +133,15 @@ public class MergeSort {
         for (String s : students) {
             System.out.print(" / " + s);
         }
-        System.out.println("new order: \n");
+
         Queue<String> sortedStudents = new Queue<>();
         long start = System.nanoTime();
         for (int i = 0; i < 1000000; i += 1) {
             sortedStudents = MergeSort.mergeSort(students);
         }
         long end = System.nanoTime();
-        System.out.println("The time mergeSort takes: " + (end - start) / 1000000000.0 + " seconds");
+        System.out.println("\n \n The time mergeSort takes: " + (end - start) / 1000000000.0 + " seconds \n");
+        System.out.println("new order:");
         if (sortedStudents != null) {
             for (String s : sortedStudents) {
                 System.out.print(" / " + s);
