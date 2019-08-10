@@ -1,3 +1,6 @@
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Class for doing Radix sort
  *
@@ -23,7 +26,7 @@ public class RadixSort {
             return asciis;
         }
         int strLen = asciis.length;
-        int maxLength = Integer.MIN_VALUE;
+        int maxLength = 0;
         for (String s : asciis) {
             int len = s.length();
             if (len > maxLength) {
@@ -53,6 +56,7 @@ public class RadixSort {
     private static void sortHelperLSD(String[] asciis, int index) {
         // Optional LSD helper method for required LSD radix sort
         int strLen = asciis.length;
+        LinkedList<String>[] num2StrMap = new LinkedList[MAXASCII];
         int[] num = new int[strLen];
         for (int i = 0; i < strLen; i += 1) {
             if (asciis[i].length() <= index) {
@@ -60,11 +64,19 @@ public class RadixSort {
             } else {
                 num[i] = asciis[i].charAt(index);
             }
+            int n = num[i];
+            if (num2StrMap[n] == null) {
+                num2StrMap[n] = new LinkedList<>();
+            }
+            num2StrMap[n].add(asciis[i]);
         }
-        //int[] sorted = CountingSort.naiveCountingSort(num);
+        int[] sortedNum = CountingSort.naiveCountingSort(num);
+        for (int i = 0; i < strLen; i += 1) {
+            asciis[i] = num2StrMap[sortedNum[i]].removeFirst();
+        }
 
 
-
+        /*
         int[] counts = new int[MAXASCII];
         for (int i : num) {
             counts[i]++;
@@ -86,7 +98,7 @@ public class RadixSort {
         }
         for (int i = 0; i < strLen; i += 1) {
             asciis[i] = sorted2[i];
-        }
+        }*/
 
     }
 
