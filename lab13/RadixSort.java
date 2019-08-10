@@ -5,6 +5,8 @@
  *
  */
 public class RadixSort {
+
+    private static final int MAXASCII = 256;
     /**
      * Does LSD radix sort on the passed in array with the following restrictions:
      * The array can only have ASCII Strings (sequence of 1 byte characters)
@@ -29,12 +31,13 @@ public class RadixSort {
             }
         }
         String[] padded = new String[strLen];
-
+        System.arraycopy(asciis, 0, padded, 0, strLen);
+        /*
         for (int i = 0; i < strLen; i += 1) {
             padded[i] = String.format("%-" + maxLength + "s", asciis[i]);
             //System.out.println("old string:" + asciis[i] + " padded:" + padded[i]
             //        + " length:" + padded[i].length());
-        }
+        }*/
         for (int i = maxLength - 1; i >= 0; i -= 1) {
             sortHelperLSD(padded, i);
         }
@@ -52,25 +55,22 @@ public class RadixSort {
         int strLen = asciis.length;
         int[] num = new int[strLen];
         for (int i = 0; i < strLen; i += 1) {
-            num[i] = asciis[i].charAt(index);
+            if (asciis[i].length() <= index) {
+                num[i] = 0;
+            } else {
+                num[i] = asciis[i].charAt(index);
+            }
         }
         //int[] sorted = CountingSort.naiveCountingSort(num);
 
-        // find max
-        int max = Integer.MIN_VALUE;
-        for (int i : num) {
-            max = max > i ? max : i;
-        }
 
-        // gather all the counts for each value
-        int[] counts = new int[max + 1];
+
+        int[] counts = new int[MAXASCII];
         for (int i : num) {
             counts[i]++;
         }
 
-        // however, below is a more proper, generalized implementation of
-        // counting sort that uses start position calculation
-        int[] starts = new int[max + 1];
+        int[] starts = new int[MAXASCII];
         int pos = 0;
         for (int i = 0; i < starts.length; i += 1) {
             starts[i] = pos;

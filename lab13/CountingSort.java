@@ -38,6 +38,7 @@ public class CountingSort {
 
         // however, below is a more proper, generalized implementation of
         // counting sort that uses start position calculation
+        /*
         int[] starts = new int[max + 1];
         int pos = 0;
         for (int i = 0; i < starts.length; i += 1) {
@@ -51,7 +52,7 @@ public class CountingSort {
             int place = starts[item];
             sorted2[place] = item;
             starts[item] += 1;
-        }
+        }*/
 
         // return the sorted array
         return sorted;
