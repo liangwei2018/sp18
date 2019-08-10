@@ -71,21 +71,26 @@ public class CountingSort {
         if (arr == null || arr.length <= 1) {
             return arr;
         }
-        int min = 0;
+        int min = Integer.MAX_VALUE;
         for (int i : arr) {
             if (i < min) {
                 min = i;
             }
         }
-        int len = arr.length;
-        int[] newArr = new int[len];
-        for (int i = 0; i < len; i += 1) {
-            newArr[i] = arr[i] - min;
+        if (min < 0) {
+            int len = arr.length;
+            int[] newArr = new int[len];
+            for (int i = 0; i < len; i += 1) {
+                newArr[i] = arr[i] - min;
+            }
+            newArr = naiveCountingSort(newArr);
+            for (int i = 0; i < len; i += 1) {
+                newArr[i] += min;
+            }
+            return newArr;
+        } else {
+            return naiveCountingSort(arr);
         }
-        newArr = naiveCountingSort(newArr);
-        for (int i = 0; i < len; i += 1) {
-            newArr[i] += min;
-        }
-        return newArr;
+
     }
 }
