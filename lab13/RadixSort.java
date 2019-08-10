@@ -16,8 +16,29 @@ public class RadixSort {
      * @return String[] the sorted array
      */
     public static String[] sort(String[] asciis) {
-        // TODO: Implement LSD Sort
-        return null;
+        // TO DO: Implement LSD Sort
+        if (asciis == null || asciis.length <= 1) {
+            return asciis;
+        }
+        int strLen = asciis.length;
+        int maxLength = Integer.MIN_VALUE;
+        for (String s : asciis) {
+            int len = s.length();
+            if (len > maxLength) {
+                maxLength = len;
+            }
+        }
+        String[] padded = new String[strLen];
+
+        for (int i = 0; i < strLen; i += 1) {
+            padded[i] = String.format("%-" + maxLength + "s", asciis[i]);
+            //System.out.println("old string:" + asciis[i] + " padded:" + padded[i]
+            //        + " length:" + padded[i].length());
+        }
+        for (int i = maxLength - 1; i >= 0; i -= 1) {
+            sortHelperLSD(padded, i);
+        }
+        return padded;
     }
 
     /**
@@ -28,7 +49,43 @@ public class RadixSort {
      */
     private static void sortHelperLSD(String[] asciis, int index) {
         // Optional LSD helper method for required LSD radix sort
-        return;
+        int strLen = asciis.length;
+        int[] num = new int[strLen];
+        for (int i = 0; i < strLen; i += 1) {
+            num[i] = asciis[i].charAt(index);
+        }
+        //int[] sorted = CountingSort.naiveCountingSort(num);
+
+        // gather all the counts for each value
+        int[] counts = new int[256];
+        for (int i : num) {
+            counts[i]++;
+        }
+
+        // however, below is a more proper, generalized implementation of
+        // counting sort that uses start position calculation
+        int[] starts = new int[256];
+        int pos = 0;
+        for (int i = 0; i < starts.length; i += 1) {
+            starts[i] = pos;
+            pos += counts[i];
+        }
+
+        String[] sorted2 = new String[num.length];
+        for (int i = 0; i < num.length; i += 1) {
+            int item = num[i];
+            int place = starts[item];
+            sorted2[place] = asciis[i];
+            starts[item] += 1;
+        }
+        /*
+        for (String s : sorted2) {
+            System.out.println("padded string's " + index + "th char is sorted:" + s);
+        }*/
+        for (int i = 0; i < strLen; i += 1) {
+            asciis[i] = sorted2[i];
+        }
+
     }
 
     /**
