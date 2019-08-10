@@ -40,10 +40,11 @@ public class RadixSort {
             padded[i] = String.format("%-" + maxLength + "s", asciis[i]);
             //System.out.println("old string:" + asciis[i] + " padded:" + padded[i]
             //        + " length:" + padded[i].length());
-        }*/
+        }
         for (int i = maxLength - 1; i >= 0; i -= 1) {
             sortHelperLSD(padded, i);
-        }
+        }*/
+        sortHelperLSD(padded, maxLength);
         return padded;
     }
 
@@ -56,49 +57,41 @@ public class RadixSort {
     private static void sortHelperLSD(String[] asciis, int index) {
         // Optional LSD helper method for required LSD radix sort
         int strLen = asciis.length;
-        LinkedList<String>[] num2StrMap = new LinkedList[MAXASCII];
         int[] num = new int[strLen];
-        for (int i = 0; i < strLen; i += 1) {
-            if (asciis[i].length() <= index) {
-                num[i] = 0;
-            } else {
-                num[i] = asciis[i].charAt(index);
+        String[] sorted2 = new String[strLen];
+
+        for (int p = index - 1; p >= 0; p -= 1) {
+            for (int i = 0; i < strLen; i += 1) {
+                if (asciis[i].length() <= p) {
+                    num[i] = 0;
+                } else {
+                    num[i] = asciis[i].charAt(p);
+                }
             }
-            int n = num[i];
-            if (num2StrMap[n] == null) {
-                num2StrMap[n] = new LinkedList<>();
+
+            int[] counts = new int[MAXASCII];
+            for (int i : num) {
+                counts[i]++;
             }
-            num2StrMap[n].add(asciis[i]);
-        }
-        int[] sortedNum = CountingSort.naiveCountingSort(num);
-        for (int i = 0; i < strLen; i += 1) {
-            asciis[i] = num2StrMap[sortedNum[i]].removeFirst();
-        }
+
+            int[] starts = new int[MAXASCII];
+            int pos = 0;
+            for (int i = 0; i < MAXASCII; i += 1) {
+                starts[i] = pos;
+                pos += counts[i];
+            }
 
 
-        /*
-        int[] counts = new int[MAXASCII];
-        for (int i : num) {
-            counts[i]++;
+            for (int i = 0; i < strLen; i += 1) {
+                int item = num[i];
+                int place = starts[item];
+                sorted2[place] = asciis[i];
+                starts[item] += 1;
+            }
+            for (int i = 0; i < strLen; i += 1) {
+                asciis[i] = sorted2[i];
+            }
         }
-
-        int[] starts = new int[MAXASCII];
-        int pos = 0;
-        for (int i = 0; i < starts.length; i += 1) {
-            starts[i] = pos;
-            pos += counts[i];
-        }
-
-        String[] sorted2 = new String[num.length];
-        for (int i = 0; i < num.length; i += 1) {
-            int item = num[i];
-            int place = starts[item];
-            sorted2[place] = asciis[i];
-            starts[item] += 1;
-        }
-        for (int i = 0; i < strLen; i += 1) {
-            asciis[i] = sorted2[i];
-        }*/
 
     }
 
