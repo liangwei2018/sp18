@@ -56,15 +56,21 @@ public class RadixSort {
         }
         //int[] sorted = CountingSort.naiveCountingSort(num);
 
+        // find max
+        int max = Integer.MIN_VALUE;
+        for (int i : num) {
+            max = max > i ? max : i;
+        }
+
         // gather all the counts for each value
-        int[] counts = new int[256];
+        int[] counts = new int[max + 1];
         for (int i : num) {
             counts[i]++;
         }
 
         // however, below is a more proper, generalized implementation of
         // counting sort that uses start position calculation
-        int[] starts = new int[256];
+        int[] starts = new int[max + 1];
         int pos = 0;
         for (int i = 0; i < starts.length; i += 1) {
             starts[i] = pos;
@@ -78,10 +84,6 @@ public class RadixSort {
             sorted2[place] = asciis[i];
             starts[item] += 1;
         }
-        /*
-        for (String s : sorted2) {
-            System.out.println("padded string's " + index + "th char is sorted:" + s);
-        }*/
         for (int i = 0; i < strLen; i += 1) {
             asciis[i] = sorted2[i];
         }

@@ -6,6 +6,7 @@ public class RadixSortTester {
 
 
     private static String[] someStr = {"California", "AB", "Banana", "US", "Canada", "Iowa", "New York"};
+    private static String[] specialStr = {"@California", "&AB", "/Banana", "US", "Canada)", "I%owa", "New York"};
     private static String[] oneStr = {"California"};
     private static String[] emptyStr = {""};
 
@@ -36,6 +37,12 @@ public class RadixSortTester {
     @Test
     public void testRadixSortWithEmptyStr() {
         String[] sortedSomeStr = RadixSort.sort(emptyStr);
+        assertIsSorted(sortedSomeStr);
+    }
+
+    @Test
+    public void testRadixSortWithSpecialStr() {
+        String[] sortedSomeStr = RadixSort.sort(specialStr);
         assertIsSorted(sortedSomeStr);
     }
 }
