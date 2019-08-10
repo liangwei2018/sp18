@@ -88,9 +88,7 @@ public class RadixSort {
                 sorted2[place] = asciis[i];
                 starts[item] += 1;
             }
-            for (int i = 0; i < strLen; i += 1) {
-                asciis[i] = sorted2[i];
-            }
+            System.arraycopy(sorted2, 0, asciis, 0, strLen);
         }
 
     }
